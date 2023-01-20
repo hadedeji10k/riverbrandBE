@@ -1,0 +1,66 @@
+datasource db {
+    url      = env("DATABASE_URL")
+    provider = "postgresql"
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["fullTextSearch"]
+}
+
+model User {
+    id               String    @id @default(uuid()) @db.Uuid
+    fullName         String    @map("full_name") @db.VarChar
+    email            String    @unique @db.VarChar
+    phone            String?   @unique @db.VarChar
+    password         String    @db.VarChar
+    username         String?   @unique @db.VarChar
+    gender           String?   @db.VarChar(6)
+    age              Int?      @db.Integer
+    avatar           String?   @default("") @db.Text
+    line1            String?   @db.VarChar
+    city             String?   @db.VarChar
+    state            String?   @db.VarChar
+    country          String?   @db.VarChar
+    dateOfBirth      DateTime? @map("date_of_birth")
+    emailConfirmed   Boolean   @default(false) @map("email_confirmed")
+    phoneConfirmed   Boolean   @default(false) @map("phone_confirmed")
+    isVerified       Boolean   @default(false) @map("is_verified")
+    isSuspended      Boolean   @default(false) @map("is_suspended")
+    phoneOtpCode     String?   @map("phone_otp_code")
+    emailOtpCode     String?   @map("email_otp_code")
+    passwordOtpCode  String?   @map("password_otp_code")
+    isDeleted        Boolean   @default(false) @map("is_deleted")
+    otpExpiryDate    DateTime? @map("otp_expiry_date")
+    createdAt        DateTime  @default(now()) @map("created_at")
+    updatedAt        DateTime  @updatedAt @map("updated_at")
+    deletedAt        DateTime? @map("deleted_at")
+    role             UserRole  @default(USER)
+    interests        String[]  @db.VarChar
+    isReferred       Boolean   @default(false) @map("is_referred")
+    referrerId       String?   @map("referrer_id") @db.Uuid
+    referrer         User?     @relation("referral", fields: [referrerId], references: [id])
+    lastDayStreak    DateTime? @default(now()) @map("last_day_streak")
+    currentDayStreak Int?      @default(1) @map("current_day_streak")
+    referrals        User[]    @relation("referral")
+
+    @@map("users")
+}
+
+model Config {
+    id        String    @id @default(uuid()) @db.Uuid
+    key       String    @unique
+    value     String
+    isDeleted Boolean   @default(false) @map("is_deleted")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("config")
+}
+
+enum UserRole {
+    USER
+    MODERATOR
+    ADMIN
+}
