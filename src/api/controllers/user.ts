@@ -117,22 +117,22 @@ export class UserController {
     });
   }
 
-  public async updateUserAddress(request: FastifyRequest, reply: FastifyReply) {
-    const { body, user }: { [key: string]: any } = request;
+  // public async updateUserAddress(request: FastifyRequest, reply: FastifyReply) {
+  //   const { body, user }: { [key: string]: any } = request;
 
-    const payload: IUpdateUserAddress = {
-      line1: body.line1,
-      city: body.city,
-      state: body.state,
-      country: body.country,
-    };
+  //   const payload: IUpdateUserAddress = {
+  //     line1: body.line1,
+  //     city: body.city,
+  //     state: body.state,
+  //     country: body.country,
+  //   };
 
-    const data = await this.userService.updateUserAddress(payload, user);
-    return response.success(reply, {
-      message: Message.userAddressUpdated,
-      data,
-    });
-  }
+  //   const data = await this.userService.updateUserAddress(payload, user);
+  //   return response.success(reply, {
+  //     message: Message.userAddressUpdated,
+  //     data,
+  //   });
+  // }
 
   public async updateUser(request: FastifyRequest, reply: FastifyReply) {
     const { body, user }: { [key: string]: any } = request;

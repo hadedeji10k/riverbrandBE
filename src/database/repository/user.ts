@@ -4,8 +4,8 @@ import { prisma } from "..";
 import { ICreateUserPayload } from "../../interfaces";
 
 interface IFindOptions {
-  select?: Prisma.UserSelect;
-  include?: Prisma.UserInclude;
+  select?: Prisma.user_userSelect;
+  include?: Prisma.user_userInclude;
 }
 
 @Service()
@@ -29,18 +29,18 @@ export class User {
       };
     }
 
-    return await prisma.user.create({ data });
+    return await prisma.user_user.create({ data });
   }
 
-  async findOne(where: Prisma.UserWhereInput, options?: IFindOptions) {
-    return await prisma.user.findFirst({ where: { ...where }, ...options });
+  async findOne(where: Prisma.user_userWhereInput, options?: IFindOptions) {
+    return await prisma.user_user.findFirst({ where: { ...where }, ...options });
   }
 
   public async findByEmail(email: string, options?: IFindOptions) {
     return await this.findOne({ email }, options);
   }
 
-  public async findById(id: string, options?: IFindOptions) {
+  public async findById(id: number, options?: IFindOptions) {
     return await this.findOne({ id }, options);
   }
 
@@ -52,37 +52,34 @@ export class User {
     return await this.findOne({ phone }, options);
   }
 
-  public async updateUser(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput) {
-    return await prisma.user.update({ where: { ...where }, data: { ...data } });
+  public async updateUser(where: Prisma.user_userWhereUniqueInput, data: Prisma.user_userUpdateInput) {
+    return await prisma.user_user.update({ where: { ...where }, data: { ...data } });
   }
 
-  public async findMany(where: Prisma.UserWhereUniqueInput, data: Prisma.UserFindManyArgs) {
-    return await prisma.user.findMany({ where: { ...where }, ...data });
+  public async findMany(where: Prisma.user_userWhereUniqueInput, data: Prisma.user_userFindManyArgs) {
+    return await prisma.user_user.findMany({ where: { ...where }, ...data });
   }
 
-  public async totalUsers(where?: Prisma.UserWhereInput) {
-    return await prisma.user.count({
+  public async totalUsers(where?: Prisma.user_userWhereInput) {
+    return await prisma.user_user.count({
       where: {
         ...where,
       },
     });
   }
 
-  async totalUserReferrals(id: string) {
+  async totalUserReferrals(id: number) {
     const result = await this.findOne(
       { id },
       {
         select: {
           _count: {
-            select: {
-              referrals: true,
-            },
           },
         },
       }
     );
 
     // @ts-expect-error
-    return result ? <number>result._count.referrals : 0;
+    return result ? <number>result._count : 0;
   }
 }

@@ -4,7 +4,7 @@ import { Service } from "typedi";
 @Service()
 export class Config {
   async set(key: string, value: string) {
-    const result = await prisma.config.upsert({
+    const result = await prisma.adminConfig.upsert({
       where: { key },
       create: { key, value },
       update: { key, value },
@@ -25,7 +25,7 @@ export class Config {
   }
 
   async get(key: string) {
-    const result = await prisma.config.findUnique({ where: { key } });
+    const result = await prisma.adminConfig.findUnique({ where: { key } });
     if (result)
       return {
         key: result.key,
@@ -37,7 +37,7 @@ export class Config {
     const results = [];
 
     for (let i = 0; i < keys.length; i++) {
-      const data = await prisma.config.findUnique({ where: { key: keys[i] } });
+      const data = await prisma.adminConfig.findUnique({ where: { key: keys[i] } });
       if (data) {
         results.push({ key: data.key, value: data.value });
       }

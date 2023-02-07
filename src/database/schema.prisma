@@ -1,66 +1,818 @@
-datasource db {
-    url      = env("DATABASE_URL")
-    provider = "postgresql"
-}
-
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["fullTextSearch"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
-model User {
-    id               String    @id @default(uuid()) @db.Uuid
-    fullName         String    @map("full_name") @db.VarChar
-    email            String    @unique @db.VarChar
-    phone            String?   @unique @db.VarChar
-    password         String    @db.VarChar
-    username         String?   @unique @db.VarChar
-    gender           String?   @db.VarChar(6)
-    age              Int?      @db.Integer
-    avatar           String?   @default("") @db.Text
-    line1            String?   @db.VarChar
-    city             String?   @db.VarChar
-    state            String?   @db.VarChar
-    country          String?   @db.VarChar
-    dateOfBirth      DateTime? @map("date_of_birth")
-    emailConfirmed   Boolean   @default(false) @map("email_confirmed")
-    phoneConfirmed   Boolean   @default(false) @map("phone_confirmed")
-    isVerified       Boolean   @default(false) @map("is_verified")
-    isSuspended      Boolean   @default(false) @map("is_suspended")
-    phoneOtpCode     String?   @map("phone_otp_code")
-    emailOtpCode     String?   @map("email_otp_code")
-    passwordOtpCode  String?   @map("password_otp_code")
-    isDeleted        Boolean   @default(false) @map("is_deleted")
-    otpExpiryDate    DateTime? @map("otp_expiry_date")
-    createdAt        DateTime  @default(now()) @map("created_at")
-    updatedAt        DateTime  @updatedAt @map("updated_at")
-    deletedAt        DateTime? @map("deleted_at")
-    role             UserRole  @default(USER)
-    interests        String[]  @db.VarChar
-    isReferred       Boolean   @default(false) @map("is_referred")
-    referrerId       String?   @map("referrer_id") @db.Uuid
-    referrer         User?     @relation("referral", fields: [referrerId], references: [id])
-    lastDayStreak    DateTime? @default(now()) @map("last_day_streak")
-    currentDayStreak Int?      @default(1) @map("current_day_streak")
-    referrals        User[]    @relation("referral")
-
-    @@map("users")
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-model Config {
-    id        String    @id @default(uuid()) @db.Uuid
-    key       String    @unique
-    value     String
-    isDeleted Boolean   @default(false) @map("is_deleted")
-    createdAt DateTime  @default(now()) @map("created_at")
-    updatedAt DateTime  @updatedAt @map("updated_at")
-    deletedAt DateTime? @map("deleted_at")
+model auth_group {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @unique @db.VarChar(150)
+  auth_group_permissions auth_group_permissions[]
+  user_user_groups       user_user_groups[]
 
-    @@map("config")
+  @@index([name], map: "auth_group_name_a6ea08ec_like")
 }
 
-enum UserRole {
-    USER
-    MODERATOR
-    ADMIN
+model auth_group_permissions {
+  id              BigInt          @id @default(autoincrement())
+  group_id        Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+  auth_group      auth_group      @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id")
+
+  @@unique([group_id, permission_id], map: "auth_group_permissions_group_id_permission_id_0cd325b0_uniq")
+  @@index([group_id], map: "auth_group_permissions_group_id_b120cbf9")
+  @@index([permission_id], map: "auth_group_permissions_permission_id_84c5c92e")
+}
+
+model auth_permission {
+  id                         Int                          @id @default(autoincrement())
+  name                       String                       @db.VarChar(255)
+  content_type_id            Int
+  codename                   String                       @db.VarChar(100)
+  auth_group_permissions     auth_group_permissions[]
+  django_content_type        django_content_type          @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
+  user_user_user_permissions user_user_user_permissions[]
+
+  @@unique([content_type_id, codename], map: "auth_permission_content_type_id_codename_01ab375a_uniq")
+  @@index([content_type_id], map: "auth_permission_content_type_id_2f476e4b")
+}
+
+model blog_blog {
+  date_created       DateTime             @db.Timestamptz(6)
+  id                 BigInt               @id @default(autoincrement())
+  title              String               @db.VarChar(100)
+  cover_image        String?              @db.VarChar(100)
+  content            String
+  is_publish         Boolean
+  date_updated       DateTime             @db.Timestamptz(6)
+  category_id        BigInt
+  staff_id           BigInt
+  blog_category      blog_category        @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_blog_category_id_c34d5f94_fk_blog_category_id")
+  user_user          user_user            @relation(fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_blog_staff_id_4a61a35e_fk_user_user_id")
+  blog_blogspotlight blog_blogspotlight[]
+  blog_comment       blog_comment[]
+
+  @@index([category_id], map: "blog_blog_category_id_c34d5f94")
+  @@index([staff_id], map: "blog_blog_staff_id_4a61a35e")
+}
+
+model blog_blogspotlight {
+  id        BigInt    @id @default(autoincrement())
+  blog_id   BigInt
+  blog_blog blog_blog @relation(fields: [blog_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_blogspotlight_blog_id_b9a1c965_fk_blog_blog_id")
+
+  @@index([blog_id], map: "blog_blogspotlight_blog_id_b9a1c965")
+}
+
+model blog_category {
+  id           BigInt      @id @default(autoincrement())
+  title        String      @db.VarChar(100)
+  date_created DateTime    @db.Timestamptz(6)
+  is_publish   Boolean
+  blog_blog    blog_blog[]
+}
+
+model blog_comment {
+  id           BigInt    @id @default(autoincrement())
+  name         String?   @db.VarChar(200)
+  email        String    @db.VarChar(100)
+  content      String    @db.VarChar(200)
+  date_created DateTime  @db.Timestamptz(6)
+  blog_id      BigInt
+  blog_blog    blog_blog @relation(fields: [blog_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_comment_blog_id_c664fb0d_fk_blog_blog_id")
+
+  @@index([blog_id], map: "blog_comment_blog_id_c664fb0d")
+}
+
+model django_admin_log {
+  id                  Int                  @id @default(autoincrement())
+  action_time         DateTime             @db.Timestamptz(6)
+  object_id           String?
+  object_repr         String               @db.VarChar(200)
+  action_flag         Int                  @db.SmallInt
+  change_message      String
+  content_type_id     Int?
+  user_id             BigInt
+  django_content_type django_content_type? @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  user_user           user_user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_user_id_c564eba6_fk_user_user_id")
+
+  @@index([content_type_id], map: "django_admin_log_content_type_id_c4bce8eb")
+  @@index([user_id], map: "django_admin_log_user_id_c564eba6")
+}
+
+model django_content_type {
+  id               Int                @id @default(autoincrement())
+  app_label        String             @db.VarChar(100)
+  model            String             @db.VarChar(100)
+  auth_permission  auth_permission[]
+  django_admin_log django_admin_log[]
+
+  @@unique([app_label, model], map: "django_content_type_app_label_model_76bd3d3b_uniq")
+}
+
+model django_migrations {
+  id      BigInt   @id @default(autoincrement())
+  app     String   @db.VarChar(255)
+  name    String   @db.VarChar(255)
+  applied DateTime @db.Timestamptz(6)
+}
+
+model django_session {
+  session_key  String   @id @db.VarChar(40)
+  session_data String
+  expire_date  DateTime @db.Timestamptz(6)
+
+  @@index([expire_date], map: "django_session_expire_date_a5c62663")
+  @@index([session_key], map: "django_session_session_key_c0390e0f_like")
+}
+
+model loan_collateral {
+  id                         String        @id @db.Uuid
+  loan_id                    String        @db.Uuid
+  user_email                 String        @unique @db.VarChar(254)
+  user_type                  String        @db.VarChar(30)
+  vehicle_address            String        @db.VarChar(500)
+  vehicle_brand              String        @db.VarChar(150)
+  vehicle_chasis_number      String        @db.VarChar(50)
+  vehicle_contact            String        @db.VarChar(500)
+  vehicle_current_location   String        @db.VarChar(500)
+  vehicle_current_millage    Int
+  vehicle_current_value      Decimal       @db.Decimal(20, 2)
+  vehicle_first_registration Int
+  vehicle_manufacture_year   Int
+  vehicle_reg_number         String        @db.VarChar(50)
+  vehicle_time               String        @db.VarChar(50)
+  date_created               DateTime      @db.Date
+  date_updated               DateTime      @db.Date
+  loan_userloan              loan_userloan @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_collateral_loan_id_03327384_fk_loan_userloan_id")
+
+  @@index([loan_id], map: "loan_collateral_loan_id_03327384")
+  @@index([user_email], map: "loan_collateral_user_email_004407d1_like")
+}
+
+model loan_documents {
+  id          BigInt   @id(map: "loan_loandocuments_pkey") @default(autoincrement())
+  doc         String   @db.VarChar(100)
+  doc_type    String   @db.VarChar(100)
+  status      String   @db.VarChar(20)
+  date_posted DateTime @db.Timestamptz(6)
+  type        String   @db.VarChar(15)
+  type_id     String?  @db.Uuid
+}
+
+model loan_guarantor {
+  id                    String              @id @db.Uuid
+  first_name            String?             @db.VarChar(50)
+  last_name             String?             @db.VarChar(50)
+  email                 String              @db.VarChar(100)
+  phone                 String?             @db.VarChar(50)
+  address               String?             @db.VarChar(50)
+  status                String              @db.VarChar(20)
+  loan_id               String              @db.Uuid
+  business_address      String?             @db.VarChar(50)
+  insurance             Json?
+  is_provide_collateral Boolean
+  is_registered_user    Boolean
+  position              String?             @db.VarChar(50)
+  creditor_amount       Decimal             @db.Decimal(20, 2)
+  creditor_name         String?             @db.VarChar(50)
+  debtor_amount         Decimal             @db.Decimal(20, 2)
+  debtor_name           String?             @db.VarChar(50)
+  full_name             String?             @db.VarChar(50)
+  guarantee             Json?
+  investments           Json?
+  land_buildings        Json?
+  date_created          DateTime            @db.Date
+  date_updated          DateTime            @db.Date
+  loan_userloan         loan_userloan       @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_guarantor_loan_id_474dd61b_fk_loan_userloan_id")
+  loan_japaplusloan     loan_japaplusloan[]
+
+  @@unique([loan_id, email], map: "loan_guarantor_loan_id_email_9dec5006_uniq")
+  @@index([loan_id], map: "loan_guarantor_loan_id_474dd61b")
+}
+
+model loan_japaplusloan {
+  id                        String         @id @db.Uuid
+  total_outstanding_tuition Decimal        @db.Decimal(20, 2)
+  total_paid_tuition        Decimal        @db.Decimal(20, 2)
+  obligor_status            String         @db.VarChar(20)
+  obligor_action_date       DateTime?      @db.Timestamptz(6)
+  loan_id                   String         @unique @db.Uuid
+  obligor_id                BigInt?
+  cheque_collateral_id      String         @db.Uuid
+  collateral_user           String         @db.VarChar(20)
+  obligor_signature         String?        @db.VarChar(100)
+  signature                 String         @db.VarChar(100)
+  vehicle_collateral        String?        @db.VarChar(100)
+  loan_guarantor            loan_guarantor @relation(fields: [cheque_collateral_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_japaplusloan_cheque_collateral_id_3abedd4f_fk_loan_guar")
+  loan_userloan             loan_userloan  @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_japaplusloan_loan_id_f965b7aa_fk_loan_userloan_id")
+  user_user                 user_user?     @relation(fields: [obligor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_japaplusloan_obligor_id_5614b0ad_fk_user_user_id")
+
+  @@index([cheque_collateral_id], map: "loan_japaplusloan_cheque_collateral_id_3abedd4f")
+  @@index([obligor_id], map: "loan_japaplusloan_obligor_id_5614b0ad")
+}
+
+model loan_loanispodocument {
+  id             BigInt        @id @default(autoincrement())
+  doc            String        @db.VarChar(100)
+  status         String        @db.VarChar(20)
+  approved_date  DateTime?     @db.Timestamptz(6)
+  date_posted    DateTime      @db.Timestamptz(6)
+  approved_by_id BigInt?
+  loan_id        String        @unique @db.Uuid
+  action         String        @db.VarChar(20)
+  user_user      user_user?    @relation(fields: [approved_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_loanispodocument_approved_by_id_fdb9f804_fk_user_user_id")
+  loan_userloan  loan_userloan @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_loanispodocument_loan_id_268aa4f6_fk_loan_userloan_id")
+
+  @@index([approved_by_id], map: "loan_loanispodocument_approved_by_id_fdb9f804")
+}
+
+model loan_loanpaymentlog {
+  id            String        @id @db.Uuid
+  amount        Decimal       @db.Decimal(20, 2)
+  pay_type      String        @db.VarChar(6)
+  date          DateTime      @db.Timestamptz(6)
+  loan_id       String        @db.Uuid
+  loan_userloan loan_userloan @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_loanpaymentlog_loan_id_f031200c_fk_loan_userloan_id")
+
+  @@index([loan_id], map: "loan_loanpaymentlog_loan_id_f031200c")
+}
+
+model loan_loansetup {
+  id              String          @id @db.Uuid
+  title           String          @unique @db.VarChar(250)
+  tenure_type     String          @db.VarChar(6)
+  tenure          Int
+  repayment_count Int
+  max_amount      Int
+  increment       Int
+  loan_type       String          @db.VarChar(20)
+  interest_rate   Int
+  date            DateTime        @db.Timestamptz(6)
+  is_delete       Boolean
+  interest_range  Json?
+  loan_option     String          @db.VarChar(20)
+  required_files  Json?
+  loan_userloan   loan_userloan[]
+
+  @@index([title], map: "loan_loansetup_title_54db77b5_like")
+}
+
+model loan_requestloanrollover {
+  id                                                                String         @id @db.Uuid
+  amount                                                            Decimal        @db.Decimal(20, 2)
+  interest_rate                                                     Decimal        @db.Decimal(20, 2)
+  tenure                                                            Int
+  tenure_type                                                       String         @db.VarChar(6)
+  status                                                            String         @db.VarChar(10)
+  approved_date                                                     DateTime?      @db.Timestamptz(6)
+  requested_date                                                    DateTime       @db.Timestamptz(6)
+  approved_by_id                                                    BigInt?
+  loan_id                                                           String         @db.Uuid
+  new_loan_id                                                       String?        @db.Uuid
+  user_user                                                         user_user?     @relation(fields: [approved_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_requestloanroll_approved_by_id_9fa42f0f_fk_user_user")
+  loan_userloan_loan_requestloanrollover_new_loan_idToloan_userloan loan_userloan? @relation("loan_requestloanrollover_new_loan_idToloan_userloan", fields: [new_loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_requestloanroll_new_loan_id_3916eac2_fk_loan_user")
+  loan_userloan_loan_requestloanrollover_loan_idToloan_userloan     loan_userloan  @relation("loan_requestloanrollover_loan_idToloan_userloan", fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_requestloanrollover_loan_id_7e1f5845_fk_loan_userloan_id")
+
+  @@index([approved_by_id], map: "loan_requestloanrollover_approved_by_id_9fa42f0f")
+  @@index([loan_id], map: "loan_requestloanrollover_loan_id_7e1f5845")
+  @@index([new_loan_id], map: "loan_requestloanrollover_new_loan_id_3916eac2")
+}
+
+model loan_userloan {
+  id                                                                           String                     @id @db.Uuid
+  amount                                                                       Decimal                    @db.Decimal(20, 2)
+  management_percentage                                                        Decimal                    @db.Decimal(20, 2)
+  tenure                                                                       Int
+  tenure_type                                                                  String                     @db.VarChar(6)
+  repay_count                                                                  Int?
+  interest_rate                                                                Int?
+  interest_amount                                                              Decimal?                   @db.Decimal(20, 2)
+  per_installment                                                              Decimal?                   @db.Decimal(20, 2)
+  re_payable_amount                                                            Decimal?                   @db.Decimal(20, 2)
+  last_pay_date                                                                DateTime?                  @db.Timestamptz(6)
+  next_pay_date                                                                DateTime?                  @db.Timestamptz(6)
+  amount_to_disburse                                                           Decimal?                   @db.Decimal(20, 2)
+  penalty                                                                      Decimal?                   @db.Decimal(20, 2)
+  default_count                                                                Int?
+  status                                                                       String                     @db.VarChar(20)
+  remark                                                                       String?
+  approved_date                                                                DateTime?                  @db.Timestamptz(6)
+  disbursed_date                                                               DateTime?                  @db.Timestamptz(6)
+  completed                                                                    Boolean?
+  completed_date                                                               DateTime?                  @db.Timestamptz(6)
+  create_date                                                                  DateTime                   @db.Timestamptz(6)
+  docs                                                                         Json?
+  mono_plan                                                                    String?                    @db.VarChar(500)
+  connect_mono                                                                 Boolean
+  mono_connect_link                                                            String?
+  mono_key                                                                     String?                    @db.VarChar(254)
+  approve_by_id                                                                BigInt?
+  disbursed_by_id                                                              BigInt?
+  loan_id                                                                      String                     @db.Uuid
+  user_id                                                                      BigInt
+  rejected_by_id                                                               BigInt?
+  rejected_date                                                                DateTime?                  @db.Timestamptz(6)
+  is_rollover                                                                  Boolean
+  disbursement_bank_id                                                         BigInt?
+  agreed_date                                                                  DateTime?                  @db.Timestamptz(6)
+  maturity_date                                                                DateTime?                  @db.Timestamptz(6)
+  new_maturity_date                                                            DateTime?                  @db.Timestamptz(6)
+  collateral_type                                                              String?                    @db.VarChar(20)
+  current_indebtness                                                           Decimal                    @db.Decimal(20, 2)
+  loan_collateral                                                              loan_collateral[]
+  loan_guarantor                                                               loan_guarantor[]
+  loan_japaplusloan                                                            loan_japaplusloan?
+  loan_loanispodocument                                                        loan_loanispodocument?
+  loan_loanpaymentlog                                                          loan_loanpaymentlog[]
+  loan_requestloanrollover_loan_requestloanrollover_new_loan_idToloan_userloan loan_requestloanrollover[] @relation("loan_requestloanrollover_new_loan_idToloan_userloan")
+  loan_requestloanrollover_loan_requestloanrollover_loan_idToloan_userloan     loan_requestloanrollover[] @relation("loan_requestloanrollover_loan_idToloan_userloan")
+  user_user_loan_userloan_approve_by_idTouser_user                             user_user?                 @relation("loan_userloan_approve_by_idTouser_user", fields: [approve_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_userloan_approve_by_id_06b8547e_fk_user_user_id")
+  user_user_loan_userloan_disbursed_by_idTouser_user                           user_user?                 @relation("loan_userloan_disbursed_by_idTouser_user", fields: [disbursed_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_userloan_disbursed_by_id_f92c6ba7_fk_user_user_id")
+  user_userbanks                                                               user_userbanks?            @relation(fields: [disbursement_bank_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_userloan_disbursement_bank_id_e1ea1d2c_fk_user_user")
+  loan_loansetup                                                               loan_loansetup             @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_userloan_loan_id_04791fde_fk_loan_loansetup_id")
+  user_user_loan_userloan_rejected_by_idTouser_user                            user_user?                 @relation("loan_userloan_rejected_by_idTouser_user", fields: [rejected_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_userloan_rejected_by_id_76f78b78_fk_user_user_id")
+  user_user_loan_userloan_user_idTouser_user                                   user_user                  @relation("loan_userloan_user_idTouser_user", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_userloan_user_id_b1c420a4_fk_user_user_id")
+
+  @@index([approve_by_id], map: "loan_userloan_approve_by_id_06b8547e")
+  @@index([disbursed_by_id], map: "loan_userloan_disbursed_by_id_f92c6ba7")
+  @@index([disbursement_bank_id], map: "loan_userloan_disbursement_bank_id_e1ea1d2c")
+  @@index([loan_id], map: "loan_userloan_loan_id_04791fde")
+  @@index([rejected_by_id], map: "loan_userloan_rejected_by_id_76f78b78")
+  @@index([user_id], map: "loan_userloan_user_id_b1c420a4")
+}
+
+model p2p_investment {
+  id                                           String                 @id @db.Uuid
+  user_type                                    String                 @db.VarChar(10)
+  description                                  String?
+  management_amount                            Decimal                @db.Decimal(20, 2)
+  tenure                                       Int
+  tenure_type                                  String                 @db.VarChar(10)
+  amount                                       Decimal                @db.Decimal(20, 2)
+  re_payable_amount                            Decimal                @db.Decimal(20, 2)
+  amount_to_disburse                           Decimal                @db.Decimal(20, 2)
+  amount_raised                                Decimal                @db.Decimal(20, 2)
+  interest_rate                                Decimal                @db.Decimal(20, 2)
+  interest_amount                              Decimal                @db.Decimal(20, 2)
+  per_installment                              Decimal                @db.Decimal(20, 2)
+  rating                                       String?                @db.VarChar(1)
+  total_unit                                   Int
+  sold_unit                                    Int                    @db.SmallInt
+  repayment_type                               String                 @db.VarChar(15)
+  total_investor                               Int
+  penalty                                      Decimal?               @db.Decimal(20, 2)
+  default_count                                Int
+  status                                       String                 @db.VarChar(15)
+  is_available                                 Boolean
+  start_date                                   DateTime?              @db.Timestamptz(6)
+  maturity_date                                DateTime?              @db.Timestamptz(6)
+  last_pay_date                                DateTime?              @db.Timestamptz(6)
+  next_pay_date                                DateTime?              @db.Timestamptz(6)
+  completed                                    Boolean?
+  completed_date                               DateTime?              @db.Timestamptz(6)
+  date_created                                 DateTime               @db.Timestamptz(6)
+  funding_expire_date                          DateTime?              @db.Timestamptz(6)
+  updated_date                                 DateTime               @db.Timestamptz(6)
+  action                                       String?                @db.VarChar(20)
+  performed_date                               DateTime?              @db.Timestamptz(6)
+  action_remark                                String?                @db.VarChar(1000)
+  timeline                                     Json?
+  category_id                                  String                 @db.Uuid
+  disbursement_bank_id                         BigInt?
+  staff_id                                     BigInt?
+  user_id                                      BigInt
+  dispense                                     String                 @db.VarChar(15)
+  public_duration                              Int
+  title                                        String?                @db.VarChar(100)
+  increment                                    Int
+  management_history                           Json
+  identification_type                          String?                @db.VarChar(15)
+  verification_type                            String?                @db.VarChar(20)
+  p2p_investmentcategory                       p2p_investmentcategory @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_investment_category_id_f5eb91d8_fk_p2p_inves")
+  user_userbanks                               user_userbanks?        @relation(fields: [disbursement_bank_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_investment_disbursement_bank_id_84c698f9_fk_user_user")
+  user_user_p2p_investment_staff_idTouser_user user_user?             @relation("p2p_investment_staff_idTouser_user", fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_investment_staff_id_8d81e2d2_fk_user_user_id")
+  user_user_p2p_investment_user_idTouser_user  user_user              @relation("p2p_investment_user_idTouser_user", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_investment_user_id_e3155802_fk_user_user_id")
+  p2p_lender                                   p2p_lender[]
+
+  @@index([category_id], map: "p2p_investment_category_id_f5eb91d8")
+  @@index([disbursement_bank_id], map: "p2p_investment_disbursement_bank_id_84c698f9")
+  @@index([staff_id], map: "p2p_investment_staff_id_8d81e2d2")
+  @@index([user_id], map: "p2p_investment_user_id_e3155802")
+}
+
+model p2p_investmentcategory {
+  id              String           @id @db.Uuid
+  name            String           @db.VarChar(200)
+  description     String?
+  cover_image     String?          @db.VarChar(100)
+  date_created    DateTime         @db.Timestamptz(6)
+  is_user_defined Boolean
+  p2p_investment  p2p_investment[]
+}
+
+model p2p_investmentgrade {
+  id                BigInt       @id @default(autoincrement())
+  title             String       @unique @db.VarChar(2)
+  max_amount        Decimal      @db.Decimal(20, 2)
+  max_interest_rate Decimal      @db.Decimal(20, 2)
+  tenure_type       String       @db.VarChar(10)
+  max_tenure        Int
+  increment         Int
+  date_created      DateTime     @db.Timestamptz(6)
+  p2p_lender        p2p_lender[]
+
+  @@index([title], map: "p2p_investmentgrade_title_6120009d_like")
+}
+
+model p2p_lender {
+  id                                       String               @id @db.Uuid
+  tenure                                   Int
+  tenure_type                              String               @db.VarChar(10)
+  management_percentage                    Decimal              @db.Decimal(20, 2)
+  amount                                   Decimal              @db.Decimal(20, 2)
+  interest_rate                            Decimal              @db.Decimal(20, 2)
+  interest_amount                          Decimal              @db.Decimal(20, 2)
+  status                                   String               @db.VarChar(15)
+  start_date                               DateTime?            @db.Timestamptz(6)
+  maturity_date                            DateTime?            @db.Timestamptz(6)
+  completed                                Boolean?
+  completed_date                           DateTime?            @db.Timestamptz(6)
+  performed_date                           DateTime?            @db.Timestamptz(6)
+  action_remark                            String?              @db.VarChar(1000)
+  timeline                                 Json?
+  date_created                             DateTime             @db.Timestamptz(6)
+  updated_date                             DateTime             @db.Timestamptz(6)
+  staff_id                                 BigInt?
+  user_id                                  BigInt
+  grade_id                                 BigInt?
+  amount_payable                           Decimal              @db.Decimal(20, 2)
+  disbursement_bank_id                     BigInt?
+  payment_ref                              String?              @unique @db.VarChar(64)
+  lender_type                              String               @db.VarChar(15)
+  investment_id                            String?              @db.Uuid
+  user_userbanks                           user_userbanks?      @relation(fields: [disbursement_bank_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_lender_disbursement_bank_id_3e993c26_fk_user_userbanks_id")
+  p2p_investmentgrade                      p2p_investmentgrade? @relation(fields: [grade_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_lender_grade_id_3a5a1f72_fk_p2p_investmentgrade_id")
+  p2p_investment                           p2p_investment?      @relation(fields: [investment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_lender_investment_id_597002f6_fk_p2p_investment_id")
+  user_user_p2p_lender_staff_idTouser_user user_user?           @relation("p2p_lender_staff_idTouser_user", fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_lender_staff_id_4a9bcd71_fk_user_user_id")
+  user_user_p2p_lender_user_idTouser_user  user_user            @relation("p2p_lender_user_idTouser_user", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "p2p_lender_user_id_0533e592_fk_user_user_id")
+
+  @@index([disbursement_bank_id], map: "p2p_lender_disbursement_bank_id_3e993c26")
+  @@index([grade_id], map: "p2p_lender_grade_id_3a5a1f72")
+  @@index([investment_id], map: "p2p_lender_investment_id_597002f6")
+  @@index([payment_ref], map: "p2p_lender_payment_ref_8d89522f_like")
+  @@index([staff_id], map: "p2p_lender_staff_id_4a9bcd71")
+  @@index([user_id], map: "p2p_lender_user_id_0533e592")
+}
+
+model p2p_managementfee {
+  id              BigInt   @id @default(autoincrement())
+  title           String   @unique @db.VarChar(100)
+  amount_capped   Decimal  @db.Decimal(20, 2)
+  percentage      Int
+  management_type String   @db.VarChar(10)
+  is_active       Boolean
+  date_created    DateTime @db.Timestamptz(6)
+
+  @@index([title], map: "p2p_managementfee_title_82827459_like")
+}
+
+model p2p_termsheet {
+  id             BigInt    @id @default(autoincrement())
+  type_id        String    @unique @db.Uuid
+  type           String    @db.VarChar(15)
+  repayment_plan String    @db.VarChar(15)
+  current_amount Decimal   @db.Decimal(20, 2)
+  current_date   DateTime? @db.Date
+  sheets         Json
+  date           DateTime  @db.Timestamptz(6)
+  count          Int
+  status         String    @db.VarChar(15)
+}
+
+model payment_paymentlog {
+  id           String   @id @db.Uuid
+  instance     String   @db.VarChar(20)
+  instance_id  String   @db.Uuid
+  amount       Decimal  @db.Decimal(20, 2)
+  action       String   @db.VarChar(10)
+  verified     Boolean
+  date_created DateTime @db.Timestamptz(6)
+}
+
+model payment_transaction {
+  id           String    @id @db.Uuid
+  type         String    @db.VarChar(20)
+  mode         String    @db.VarChar(20)
+  ref          String    @unique @db.VarChar(64)
+  parent_ref   String    @db.VarChar(64)
+  amount       Decimal   @db.Decimal(1000, 2)
+  status       String    @db.VarChar(12)
+  payment_date DateTime  @db.Timestamptz(6)
+  is_completed Boolean
+  date         DateTime  @db.Timestamptz(6)
+  date_updated DateTime  @db.Timestamptz(6)
+  user_id      BigInt
+  online_mode  String    @db.VarChar(15)
+  user_user    user_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_transaction_user_id_9e60d11b_fk_user_user_id")
+
+  @@index([ref], map: "payment_transaction_ref_d072898e_like")
+  @@index([user_id], map: "payment_transaction_user_id_9e60d11b")
+}
+
+model savings_savingssetup {
+  id                  String                @id @db.Uuid
+  min_tenure          Int?
+  min_amount          Int?
+  can_liquidate       Boolean
+  interest_range      Json?
+  interest            Int
+  increment           Int
+  savings_type        String                @db.VarChar(20)
+  date                DateTime              @db.Timestamptz(6)
+  is_delete           Boolean
+  breakage_range      Json?
+  savings_usersavings savings_usersavings[]
+}
+
+model savings_usersavinginterestlog {
+  id                  String              @id @db.Uuid
+  amount              Float
+  created_date        DateTime            @db.Timestamptz(6)
+  saving_id           String              @db.Uuid
+  savings_usersavings savings_usersavings @relation(fields: [saving_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "savings_usersavingin_saving_id_e9364f54_fk_savings_u")
+
+  @@index([saving_id], map: "savings_usersavinginterestlog_saving_id_e9364f54")
+}
+
+model savings_usersavings {
+  id                                                      String                          @id @db.Uuid
+  title                                                   String                          @db.VarChar(254)
+  amount                                                  Decimal                         @db.Decimal(20, 2)
+  current_balance                                         Decimal                         @db.Decimal(20, 2)
+  interest_rate                                           Decimal                         @db.Decimal(20, 2)
+  tenure                                                  Int
+  status                                                  String                          @db.VarChar(20)
+  created_date                                            DateTime                        @db.Timestamptz(6)
+  expected_payout_date                                    DateTime?                       @db.Timestamptz(6)
+  actual_pay_out_date                                     DateTime?                       @db.Timestamptz(6)
+  set_up_id                                               String?                         @db.Uuid
+  user_id                                                 BigInt?
+  total_interest_amount                                   Decimal                         @db.Decimal(20, 2)
+  modified_by_id                                          BigInt?
+  modified_date                                           DateTime?                       @db.Timestamptz(6)
+  breakage_by_id                                          BigInt?
+  breakage_date                                           DateTime?                       @db.Timestamptz(6)
+  request_termination                                     Boolean
+  payable_amount                                          Decimal                         @db.Decimal(20, 2)
+  govern_withdrawal_tax_amount                            Decimal                         @db.Decimal(20, 2)
+  govern_withdrawal_tax_rate                              Decimal                         @db.Decimal(20, 2)
+  gross_interest_amount                                   Decimal                         @db.Decimal(20, 2)
+  end_date                                                DateTime?                       @db.Date
+  start_date                                              DateTime?                       @db.Date
+  breakage_rate                                           Decimal                         @db.Decimal(20, 2)
+  savings_usersavinginterestlog                           savings_usersavinginterestlog[]
+  user_user_savings_usersavings_breakage_by_idTouser_user user_user?                      @relation("savings_usersavings_breakage_by_idTouser_user", fields: [breakage_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "savings_usersavings_breakage_by_id_3371f6b4_fk_user_user_id")
+  user_user_savings_usersavings_modified_by_idTouser_user user_user?                      @relation("savings_usersavings_modified_by_idTouser_user", fields: [modified_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "savings_usersavings_modified_by_id_9f35234e_fk_user_user_id")
+  savings_savingssetup                                    savings_savingssetup?           @relation(fields: [set_up_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "savings_usersavings_set_up_id_713f871b_fk_savings_s")
+  user_user_savings_usersavings_user_idTouser_user        user_user?                      @relation("savings_usersavings_user_idTouser_user", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "savings_usersavings_user_id_bc4abd94_fk_user_user_id")
+  savings_usersavingslog                                  savings_usersavingslog[]
+
+  @@index([breakage_by_id], map: "savings_usersavings_breakage_by_id_3371f6b4")
+  @@index([modified_by_id], map: "savings_usersavings_modified_by_id_9f35234e")
+  @@index([set_up_id], map: "savings_usersavings_set_up_id_713f871b")
+  @@index([user_id], map: "savings_usersavings_user_id_bc4abd94")
+}
+
+model savings_usersavingslog {
+  id                  String              @id @db.Uuid
+  amount              Decimal             @db.Decimal(20, 2)
+  created_date        DateTime            @db.Timestamptz(6)
+  action              String              @db.VarChar(10)
+  verified            Boolean
+  saving_id           String              @db.Uuid
+  savings_usersavings savings_usersavings @relation(fields: [saving_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "savings_usersavingsl_saving_id_94a440ff_fk_savings_u")
+
+  @@index([saving_id], map: "savings_usersavingslog_saving_id_94a440ff")
+}
+
+model slideshow_slideshow {
+  id           BigInt    @id @default(autoincrement())
+  heading      String    @db.VarChar(100)
+  image        String?   @db.VarChar(100)
+  is_publish   Boolean
+  date_created DateTime  @db.Timestamptz(6)
+  caption      String    @db.VarChar(1000)
+  staff_id     BigInt
+  user_user    user_user @relation(fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "slideshow_slideshow_staff_id_13013234_fk_user_user_id")
+
+  @@index([staff_id], map: "slideshow_slideshow_staff_id_13013234")
+}
+
+model user_banks {
+  id                   BigInt           @id @default(autoincrement())
+  country              String           @db.VarChar(50)
+  bank_code            String?          @db.VarChar(15)
+  bank_name            String           @db.VarChar(50)
+  is_delete            Boolean
+  is_loan_availability Boolean
+  user_userbanks       user_userbanks[]
+}
+
+model user_country {
+  id         String       @id @db.Uuid
+  name       String       @unique @db.VarChar(100)
+  currency   String       @db.VarChar(10)
+  code       String       @db.VarChar(3)
+  unicode    String       @db.VarChar(10)
+  user_state user_state[]
+
+  @@index([name], map: "user_country_name_d0d8a512_like")
+}
+
+model user_relationship {
+  id    BigInt @id @default(autoincrement())
+  title String @db.VarChar(100)
+}
+
+model user_state {
+  id                                               String       @id @db.Uuid
+  name                                             String       @db.VarChar(100)
+  country_id                                       String       @db.Uuid
+  user_country                                     user_country @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_state_country_id_b7e8d62d_fk_user_country_id")
+  user_user_user_user_location_idTouser_state      user_user[]  @relation("user_user_location_idTouser_state")
+  user_user_user_user_next_location_idTouser_state user_user[]  @relation("user_user_next_location_idTouser_state")
+
+  @@index([country_id], map: "user_state_country_id_b7e8d62d")
+}
+
+model user_testimonial {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  content     String   @db.VarChar(1000)
+  date_posted DateTime @db.Timestamptz(6)
+}
+
+model user_user {
+  id                                                                BigInt                          @id @default(autoincrement())
+  password                                                          String                          @db.VarChar(128)
+  last_login                                                        DateTime?                       @db.Timestamptz(6)
+  is_superuser                                                      Boolean
+  username                                                          String                          @unique @db.VarChar(150)
+  first_name                                                        String                          @db.VarChar(150)
+  last_name                                                         String                          @db.VarChar(150)
+  email                                                             String                          @db.VarChar(254)
+  is_staff                                                          Boolean
+  is_active                                                         Boolean
+  date_joined                                                       DateTime                        @db.Timestamptz(6)
+  phone                                                             String                          @db.VarChar(20)
+  address                                                           String?                         @db.VarChar(100)
+  user_type                                                         String                          @db.VarChar(10)
+  docs                                                              Json?
+  avatar                                                            String?                         @db.VarChar(100)
+  bvn                                                               String?                         @unique(map: "user_user_bvn_4af35fa3_uniq") @db.VarChar(20)
+  dob                                                               DateTime?                       @db.Date
+  nin                                                               String?                         @unique(map: "user_user_nin_7a3b2c8e_uniq") @db.VarChar(20)
+  access                                                            Boolean
+  employment                                                        Json?
+  id_type                                                           String?                         @db.VarChar(50)
+  kyc_completed                                                     Boolean
+  remark                                                            String?
+  bank                                                              Json?
+  maiden_name                                                       String?                         @db.VarChar(40)
+  marital                                                           String?                         @db.VarChar(20)
+  mother_maiden_name                                                String?                         @db.VarChar(40)
+  next_address                                                      String?                         @db.VarChar(100)
+  next_first_name                                                   String?                         @db.VarChar(40)
+  secondary_email                                                   String?                         @db.VarChar(100)
+  secondary_phone                                                   String?                         @db.VarChar(20)
+  sex                                                               String?                         @db.VarChar(20)
+  referral_code                                                     String?                         @unique @db.VarChar(10)
+  user_referral_code                                                String?                         @db.VarChar(10)
+  doc_birth_certificate                                             String?                         @db.VarChar(100)
+  doc_national                                                      String?                         @db.VarChar(100)
+  doc_nin                                                           String?                         @db.VarChar(100)
+  doc_passport                                                      String?                         @db.VarChar(100)
+  doc_signature                                                     String?                         @db.VarChar(100)
+  is_bank_completed                                                 Boolean
+  is_bvn_added                                                      Boolean
+  is_bvn_verified                                                   Boolean
+  is_document_completed                                             Boolean
+  is_employment_completed                                           Boolean
+  is_next_of_kin_completed                                          Boolean
+  is_personal_completed                                             Boolean
+  landmark                                                          String?                         @db.VarChar(100)
+  next_email                                                        String?                         @db.VarChar(100)
+  next_last_name                                                    String?                         @db.VarChar(40)
+  next_phone                                                        String?                         @db.VarChar(20)
+  next_relationship                                                 String?                         @db.VarChar(15)
+  location_id                                                       String?                         @db.Uuid
+  next_location_id                                                  String?                         @db.Uuid
+  blog_blog                                                         blog_blog[]
+  django_admin_log                                                  django_admin_log[]
+  loan_japaplusloan                                                 loan_japaplusloan[]
+  loan_loanispodocument                                             loan_loanispodocument[]
+  loan_requestloanrollover                                          loan_requestloanrollover[]
+  loan_userloan_loan_userloan_approve_by_idTouser_user              loan_userloan[]                 @relation("loan_userloan_approve_by_idTouser_user")
+  loan_userloan_loan_userloan_disbursed_by_idTouser_user            loan_userloan[]                 @relation("loan_userloan_disbursed_by_idTouser_user")
+  loan_userloan_loan_userloan_rejected_by_idTouser_user             loan_userloan[]                 @relation("loan_userloan_rejected_by_idTouser_user")
+  loan_userloan_loan_userloan_user_idTouser_user                    loan_userloan[]                 @relation("loan_userloan_user_idTouser_user")
+  p2p_investment_p2p_investment_staff_idTouser_user                 p2p_investment[]                @relation("p2p_investment_staff_idTouser_user")
+  p2p_investment_p2p_investment_user_idTouser_user                  p2p_investment[]                @relation("p2p_investment_user_idTouser_user")
+  p2p_lender_p2p_lender_staff_idTouser_user                         p2p_lender[]                    @relation("p2p_lender_staff_idTouser_user")
+  p2p_lender_p2p_lender_user_idTouser_user                          p2p_lender[]                    @relation("p2p_lender_user_idTouser_user")
+  payment_transaction                                               payment_transaction[]
+  savings_usersavings_savings_usersavings_breakage_by_idTouser_user savings_usersavings[]           @relation("savings_usersavings_breakage_by_idTouser_user")
+  savings_usersavings_savings_usersavings_modified_by_idTouser_user savings_usersavings[]           @relation("savings_usersavings_modified_by_idTouser_user")
+  savings_usersavings_savings_usersavings_user_idTouser_user        savings_usersavings[]           @relation("savings_usersavings_user_idTouser_user")
+  slideshow_slideshow                                               slideshow_slideshow[]
+  user_state_user_user_location_idTouser_state                      user_state?                     @relation("user_user_location_idTouser_state", fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_location_id_02efbfc9_fk_user_state_id")
+  user_state_user_user_next_location_idTouser_state                 user_state?                     @relation("user_user_next_location_idTouser_state", fields: [next_location_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_next_location_id_e98bf1fc_fk_user_state_id")
+  user_user_groups                                                  user_user_groups[]
+  user_user_user_permissions                                        user_user_user_permissions[]
+  user_userbanks                                                    user_userbanks[]
+  user_userpasswordverification                                     user_userpasswordverification[]
+  user_usersverification                                            user_usersverification[]
+
+  @@index([bvn], map: "user_user_bvn_4af35fa3_like")
+  @@index([location_id], map: "user_user_location_id_02efbfc9")
+  @@index([next_location_id], map: "user_user_next_location_id_e98bf1fc")
+  @@index([nin], map: "user_user_nin_7a3b2c8e_like")
+  @@index([referral_code], map: "user_user_referral_code_a925f8f9_like")
+  @@index([username], map: "user_user_username_e2bdfe0c_like")
+}
+
+model user_user_groups {
+  id         BigInt     @id @default(autoincrement())
+  user_id    BigInt
+  group_id   Int
+  auth_group auth_group @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_groups_group_id_c57f13c0_fk_auth_group_id")
+  user_user  user_user  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_groups_user_id_13f9a20d_fk_user_user_id")
+
+  @@unique([user_id, group_id], map: "user_user_groups_user_id_group_id_bb60391f_uniq")
+  @@index([group_id], map: "user_user_groups_group_id_c57f13c0")
+  @@index([user_id], map: "user_user_groups_user_id_13f9a20d")
+}
+
+model user_user_user_permissions {
+  id              BigInt          @id @default(autoincrement())
+  user_id         BigInt
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_user_permi_permission_id_ce49d4de_fk_auth_perm")
+  user_user       user_user       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_user_permissions_user_id_31782f58_fk_user_user_id")
+
+  @@unique([user_id, permission_id], map: "user_user_user_permissions_user_id_permission_id_64f4d5b8_uniq")
+  @@index([permission_id], map: "user_user_user_permissions_permission_id_ce49d4de")
+  @@index([user_id], map: "user_user_user_permissions_user_id_31782f58")
+}
+
+model user_userbanks {
+  id             BigInt           @id @default(autoincrement())
+  account_no     String           @db.VarChar(20)
+  account_name   String           @db.VarChar(50)
+  is_delete      Boolean
+  bank_id        BigInt
+  user_id        BigInt?
+  loan_userloan  loan_userloan[]
+  p2p_investment p2p_investment[]
+  p2p_lender     p2p_lender[]
+  user_banks     user_banks       @relation(fields: [bank_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_userbanks_bank_id_f558d6a7_fk_user_banks_id")
+  user_user      user_user?       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_userbanks_user_id_721bdd60_fk_user_user_id")
+
+  @@index([bank_id], map: "user_userbanks_bank_id_f558d6a7")
+  @@index([user_id], map: "user_userbanks_user_id_721bdd60")
+}
+
+model user_userpasswordverification {
+  id        BigInt    @id @default(autoincrement())
+  code      String    @db.VarChar(10)
+  validity  DateTime  @db.Timestamptz(6)
+  valid     Boolean
+  user_id   BigInt
+  user_user user_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_userpasswordverification_user_id_937e5447_fk_user_user_id")
+
+  @@index([user_id], map: "user_userpasswordverification_user_id_937e5447")
+}
+
+model user_usersverification {
+  id        BigInt    @id @default(autoincrement())
+  code      String    @db.VarChar(10)
+  validity  DateTime  @db.Timestamptz(6)
+  valid     Boolean
+  user_id   BigInt
+  user_user user_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_usersverification_user_id_adbd7ded_fk_user_user_id")
+
+  @@index([user_id], map: "user_usersverification_user_id_adbd7ded")
+}
+
+model AdminConfig {
+  id         BigInt  @id @default(autoincrement())
+  key        String  @unique @db.VarChar()
+  value      String  @db.VarChar()
+  is_deleted Boolean @default(false)
 }

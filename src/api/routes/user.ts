@@ -61,14 +61,14 @@ export async function user(app: FastifyInstance) {
     },
     controller.verifyPhoneNumber.bind(controller)
   );
-  app.put(
-    "/address",
-    {
-      schema: { body: updateUserAddressSchema },
-      onRequest: [auth.user(), auth.ensureUserNotSuspended(), auth.ensureEmailConfirmed()],
-    },
-    controller.updateUserAddress.bind(controller)
-  );
+  // app.put(
+  //   "/address",
+  //   {
+  //     schema: { body: updateUserAddressSchema },
+  //     onRequest: [auth.user(), auth.ensureUserNotSuspended(), auth.ensureEmailConfirmed()],
+  //   },
+  //   controller.updateUserAddress.bind(controller)
+  // );
   app.put(
     "/",
     {

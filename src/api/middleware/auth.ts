@@ -17,7 +17,7 @@ const dailyLoginReward = 5;
 function userAuth(options: IOptions = {}) {
   return async (request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction) => {
     try {
-      const data: { id: string } = await request.jwtVerify();
+      const data: { id: number } = await request.jwtVerify();
 
       const userExists = await user.findById(data.id);
       if (!userExists) {
@@ -41,7 +41,7 @@ function ensureEmailConfirmed() {
         throw new ApiError(Message.authenticationRequired, 401);
       }
 
-      if (!user.emailConfirmed) {
+      if (!user.email) {
         throw new ApiError(Message.emailConfirmationRequired, 403);
       }
     } catch (e) {
@@ -58,7 +58,7 @@ function ensurePhoneConfirmed() {
         throw new ApiError(Message.authenticationRequired, 401);
       }
 
-      if (!user.phoneConfirmed) {
+      if (!user.phone) {
         throw new ApiError(Message.phoneConfirmationRequired, 403);
       }
     } catch (e) {
@@ -75,7 +75,7 @@ function ensureUserNotSuspended() {
         throw new ApiError(Message.authenticationRequired, 401);
       }
 
-      if (user.isSuspended) {
+      if (!user.is_active) {
         throw new ApiError(Message.userSuspended, 401);
       }
     } catch (e) {
@@ -92,9 +92,9 @@ function isAdmin(options: IOptions = {}) {
         throw new ApiError(Message.authenticationRequired, 401);
       }
 
-      if (user.role != "ADMIN") {
-        throw new ApiError(Message.notAuthorized, 401);
-      }
+      // if (user.role != "ADMIN") {
+      //   throw new ApiError(Message.notAuthorized, 401);
+      // }
     } catch (e) {
       if (!options.optional) {
         done(e as Error);

@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { user_user as User } from "@prisma/client";
 
 export interface ICreateUserPayload {
   fullName: string;
@@ -50,7 +50,7 @@ export interface IUpdateUserAddress {
 }
 
 export interface IGetUser {
-  id: string;
+  id: number;
 }
 
 export interface ISuspendUser extends IGetUser { }

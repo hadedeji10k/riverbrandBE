@@ -48,7 +48,7 @@ export class AuthService {
       lastDayStreak: startOfDay(new Date()),
     });
 
-    await this._sendEmailConfirmation(user, user.emailOtpCode);
+    await this._sendEmailConfirmation(user, otpCode);
 
     return {
       token: await jwt.sign({ id: user.id }),
@@ -62,11 +62,11 @@ export class AuthService {
       throw new ApiError(Message.userNotFound, 401);
     }
 
-    if (user.isSuspended) {
+    if (!user.is_active) {
       throw new ApiError(Message.userSuspended, 401);
     }
 
-    if (!user.emailConfirmed) {
+    if (!user.email) {
       throw new ApiError(Message.emailNotVerified, 403);
     }
 
@@ -75,9 +75,9 @@ export class AuthService {
       throw new ApiError(Message.invalidPassword, 400);
     }
 
-    if (user.role !== "ADMIN") {
-      throw new ApiError(Message.signInUserNotAdmin, 401);
-    }
+    // if (user.role !== "ADMIN") {
+    //   throw new ApiError(Message.signInUserNotAdmin, 401);
+    // }
 
     return {
       token: await jwt.sign({ id: user.id }),
@@ -90,11 +90,11 @@ export class AuthService {
       throw new ApiError(Message.userNotFound, 401);
     }
 
-    if (user.isSuspended) {
+    if (!user.is_active) {
       throw new ApiError(Message.userSuspended, 401);
     }
 
-    if (!user.emailConfirmed) {
+    if (!user.email) {
       throw new ApiError(Message.emailNotVerified, 403);
     }
 
@@ -115,12 +115,12 @@ export class AuthService {
     }
 
     const otpCode = generateOTP({ type: "num", length: 6 });
-    await this.user.updateUser({ id: user.id }, { passwordOtpCode: otpCode });
+    // await this.user.updateUser({ id: user.id }, { passwordOtpCode: otpCode });
 
     const options: EmailOptions = {
       recipient: user.email,
       context: {
-        name: user.fullName.split(" ")[0],
+        name: user.first_name,
         activationCode: parseInt(otpCode),
       },
     };
@@ -137,9 +137,9 @@ export class AuthService {
       throw new ApiError(Message.userNotFound, 404);
     }
 
-    if (user.passwordOtpCode !== payload.otpCode) {
-      throw new ApiError(Message.invalidOtp, 400);
-    }
+    // if (user.passwordOtpCode !== payload.otpCode) {
+    //   throw new ApiError(Message.invalidOtp, 400);
+    // }
 
     if (await password.verify(payload.password, user.password)) {
       throw new ApiError(Message.passwordIsSameAsOld, 400);
@@ -150,14 +150,13 @@ export class AuthService {
       { id: user.id },
       {
         password: passwordHash,
-        passwordOtpCode: null,
       }
     );
 
     const options: EmailOptions = {
       recipient: user.email,
       context: {
-        name: user.fullName.split(" ")[0],
+        name: user.first_name,
       },
     };
 
@@ -186,14 +185,13 @@ export class AuthService {
       { id: user.id },
       {
         password: passwordHash,
-        passwordOtpCode: null,
       }
     );
 
     const options: EmailOptions = {
       recipient: user.email,
       context: {
-        name: user.fullName.split(" ")[0],
+        name: user.first_name,
       },
     };
 
@@ -208,7 +206,7 @@ export class AuthService {
     if (!user) {
       throw new ApiError("Email has not been registered", 404);
     }
-    if (user.emailConfirmed) {
+    if (user.email) {
       throw new ApiError("Email has already been confirmed", 409);
     }
 
@@ -221,19 +219,19 @@ export class AuthService {
     if (!user) {
       throw new ApiError("User does not exists", 404);
     }
-    if (!user.emailOtpCode) {
-      throw new ApiError("Email confirmation token is invalid", 400);
-    }
+    // if (!user.emailOtpCode) {
+    //   throw new ApiError("Email confirmation token is invalid", 400);
+    // }
 
-    if (payload.otpCode !== user.emailOtpCode) {
-      throw new ApiError("Email confirmation token is invalid", 400);
-    }
+    // if (payload.otpCode !== user.emailOtpCode) {
+    //   throw new ApiError("Email confirmation token is invalid", 400);
+    // }
 
     await this.user.updateUser(
       { id: user.id },
       {
-        emailConfirmed: true,
-        emailOtpCode: null,
+        // emailConfirmed: true,
+        // emailOtpCode: null,
       }
     );
   }
@@ -241,13 +239,13 @@ export class AuthService {
   private async _sendEmailConfirmation(user: IUser, otpCode?: string | null) {
     if (!otpCode) {
       otpCode = generateOTP({ type: "num", length: 6 });
-      await this.user.updateUser({ id: user.id }, { emailOtpCode: otpCode });
+      // await this.user.updateUser({ id: user.id }, { emailOtpCode: otpCode });
     }
 
     const options: EmailOptions = {
       recipient: user.email,
       context: {
-        name: user.fullName.split(" ")[0],
+        name: user.first_name,
         activationCode: parseInt(otpCode),
       },
     };

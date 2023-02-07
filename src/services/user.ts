@@ -40,7 +40,6 @@ export class UserService {
       { id: user.id },
       {
         username: payload.username.toLowerCase(),
-        interests: payload.interest,
       }
     );
     return;
@@ -52,7 +51,7 @@ export class UserService {
   }
 
   public async requestPhoneNumberVerification(user: IUser) {
-    if (user.phoneConfirmed) {
+    if (user.phone) {
       throw new ApiError(Message.phoneVerified, 409);
     }
 
@@ -73,7 +72,7 @@ export class UserService {
       otpExpiryDate: addMinutes(new Date(), 10),
     };
 
-    await this.user.updateUser({ email: user.email.toLowerCase() }, data);
+    await this.user.updateUser({ id: user.id }, data);
 
     return { otpCode: environment.isTestEnv ? otpCode : undefined };
   }
@@ -85,7 +84,7 @@ export class UserService {
       throw new ApiError(Message.userNotFound);
     }
 
-    if (user.phoneConfirmed) {
+    if (user.phone) {
       throw new ApiError(Message.phoneVerified, 409);
     }
 
@@ -101,9 +100,9 @@ export class UserService {
       });
 
       const data = {
-        phoneOtpCode: otpCode,
-        phoneConfirmed: false,
-        otpExpiryDate: addMinutes(new Date(), 10),
+        // phoneOtpCode: otpCode,
+        // phoneConfirmed: false,
+        // otpExpiryDate: addMinutes(new Date(), 10),
       };
 
       await this.user.updateUser({ id: user.id }, data);
@@ -121,47 +120,46 @@ export class UserService {
       throw new ApiError(Message.userNotFound);
     }
 
-    if (user.phoneConfirmed) {
+    if (user.phone) {
       throw new ApiError(Message.phoneVerified, 409);
     }
 
-    if (!isFuture(user.otpExpiryDate || new Date())) {
-      throw new ApiError(Message.otpExpired, 400);
-    }
+    // if (!isFuture(user.otpExpiryDate || new Date())) {
+    //   throw new ApiError(Message.otpExpired, 400);
+    // }
 
-    if (user.phoneOtpCode !== payload.phoneOtpCode) {
-      throw new ApiError(Message.invalidOtp, 400);
-    }
+    // if (user.phoneOtpCode !== payload.phoneOtpCode) {
+    //   throw new ApiError(Message.invalidOtp, 400);
+    // }
 
     const data = {
-      lastDayStreak: startOfDay(new Date()),
-      currentDayStreak: 1,
-      phoneConfirmed: true,
-      phoneOtpCode: null,
-      otpExpiryDate: null,
+      // lastDayStreak: startOfDay(new Date()),
+      // currentDayStreak: 1,
+      // phoneConfirmed: true,
+      // phoneOtpCode: null,
+      // otpExpiryDate: null,
     };
 
-    await this.user.updateUser({ email: user.email.toLowerCase() }, data);
+    await this.user.updateUser({ id: user.id }, data);
 
     return;
   }
 
-  public async updateUserAddress(payload: IUpdateUserAddress, user: IUser) {
-    const userObj = {
-      line1: payload.line1 ? sanitize(payload.line1) : user.line1,
-      city: payload.city ? sanitize(payload.city) : user.city,
-      state: payload.state ? sanitize(payload.state) : user.state,
-      country: payload.country ? sanitize(payload.country) : user.country,
-    };
+  // public async updateUserAddress(payload: IUpdateUserAddress, user: IUser) {
+  //   const userObj = {
+  //     line1: payload.line1 ? sanitize(payload.line1) : user.line1,
+  //     city: payload.city ? sanitize(payload.city) : user.city,
+  //     state: payload.state ? sanitize(payload.state) : user.state,
+  //     country: payload.country ? sanitize(payload.country) : user.country,
+  //   };
 
-    await this.user.updateUser({ id: user.id }, userObj);
+  //   await this.user.updateUser({ id: user.id }, userObj);
 
-    return;
-  }
+  //   return;
+  // }
 
   public async updateUser(payload: IUpdateUser, user: IUser) {
     const userObj = {
-      interests: payload.interests ? payload.interests : user.interests,
       avatar: payload.imageUrl ? payload.imageUrl : user.avatar,
       username: payload.username?.toLowerCase(),
     };
@@ -196,7 +194,7 @@ export class UserService {
     if (!user) {
       throw new ApiError(Message.userNotFound, 404);
     }
-    await this.user.updateUser({ email: payload.email }, { role: "ADMIN" });
+    // await this.user.updateUser({ id: user.id }, { role: "ADMIN" });
     return;
   }
 
@@ -205,11 +203,11 @@ export class UserService {
     if (!user) {
       throw new ApiError(Message.userNotFound, 404);
     }
-    await this.user.updateUser({ email: payload.email }, { role: "USER" });
+    // await this.user.updateUser({ id: user.id }, { role: "USER" });
     return;
   }
 
-  public async getUserData(userId: string) {
+  public async getUserData(userId: number) {
 
     return await this.user.findById(userId);
   }
@@ -220,35 +218,35 @@ export class UserService {
 
     const allUsers = await this.user.totalUsers();
 
-    const referredUsers = await this.user.totalUsers({ isReferred: true });
+    // const referredUsers = await this.user.totalUsers({ referral_code: null  });
 
-    const normalUsers = await this.user.totalUsers({ isReferred: false });
+    // const normalUsers = await this.user.totalUsers({ isReferred: false });
 
-    const totalUsersLastMonth = await this.user.totalUsers({
-      createdAt: {
-        gte: new Date(dateObj.startOfLastMonth),
-        lt: new Date(dateObj.startOfThisMonth),
-      },
-    });
+    // const totalUsersLastMonth = await this.user.totalUsers({
+    //   createdAt: {
+    //     gte: new Date(dateObj.startOfLastMonth),
+    //     lt: new Date(dateObj.startOfThisMonth),
+    //   },
+    // });
 
-    const referredUsersPercentage = ((referredUsers / allUsers) * 100).toFixed(2);
-    const normalUsersPercentage = ((normalUsers / allUsers) * 100).toFixed(2);
+    // const referredUsersPercentage = ((referredUsers / allUsers) * 100).toFixed(2);
+    // const normalUsersPercentage = ((normalUsers / allUsers) * 100).toFixed(2);
 
-    const totalUsersThisMonth = await this.user.totalUsers({
-      createdAt: {
-        gte: new Date(dateObj.startOfThisMonth),
-        lt: date,
-      },
-    });
+    // const totalUsersThisMonth = await this.user.totalUsers({
+    //   createdAt: {
+    //     gte: new Date(dateObj.startOfThisMonth),
+    //     lt: date,
+    //   },
+    // });
 
     return {
       allUsers,
-      referredUsers,
-      normalUsers,
-      referredUsersPercentage,
-      normalUsersPercentage,
-      totalUsersLastMonth,
-      totalUsersThisMonth,
+      // referredUsers,
+      // normalUsers,
+      // referredUsersPercentage,
+      // normalUsersPercentage,
+      // totalUsersLastMonth,
+      // totalUsersThisMonth,
     };
   }
 
@@ -257,13 +255,13 @@ export class UserService {
       const user = await this.user.findById(payload.id);
       if (!user) throw new ApiError(Message.userNotFound, 404);
 
-      if (user.isSuspended) throw new ApiError(Message.userAlreadySuspended, 400);
+      if (!user.is_active) throw new ApiError(Message.userAlreadySuspended, 400);
     }
 
     await this.user.updateUser(
       { id: payload.id },
       {
-        isSuspended: true,
+        is_active: false,
       }
     );
   }
@@ -273,13 +271,13 @@ export class UserService {
       const user = await this.user.findById(payload.id);
       if (!user) throw new ApiError(Message.userNotFound, 404);
 
-      if (!user.isSuspended) throw new ApiError(Message.userAlreadyEnabled, 400);
+      if (user.is_active) throw new ApiError(Message.userAlreadyEnabled, 400);
     }
 
     await this.user.updateUser(
       { id: payload.id },
       {
-        isSuspended: false,
+        is_active: true,
       }
     );
   }
@@ -295,7 +293,7 @@ export class UserService {
     const hasPrevious = currentPage > 1 && totalPages > 1;
     const hasNext = currentPage < totalPages;
 
-    const users = await this.user.findMany({}, { orderBy: { createdAt: "desc" }, take: limit, skip });
+    const users = await this.user.findMany({}, { orderBy: { id: "desc" }, take: limit, skip });
 
     return {
       result: users,
