@@ -7,7 +7,7 @@ export const accountCreationTemplate = (
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gateway - Account created</title>
+    <title>RiverBrand - Account created</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -135,11 +135,11 @@ export const accountCreationTemplate = (
         <div class="container">
 
             <section>
-                <h1 class="title">Welcome to Gateway, ${context.name}</h1>
+                <h1 class="title">Welcome to RiverBrand, ${context.name}</h1>
             </section>
             <main>
                 <p>
-                    Your OTP code from gateway is
+                    Your OTP code from riverbrand is
                 </p>
 
                 <p><span class="code">${context.activationCode}</span></p>
@@ -161,7 +161,7 @@ export const accountCreationTemplate = (
         </div>
         
         <p>
-          If you have any complaints, please contact our support or send us an email <span>support@gatewayapp.co</span>
+          If you have any complaints, please contact our support or send us an email <span>support@riverbrandapp.co</span>
         </p>
 
         
@@ -169,7 +169,7 @@ export const accountCreationTemplate = (
           <a
             class="icons"
             target="_blank"
-            href="https://www.facebook.com/mygatewayapp/"
+            href="https://www.facebook.com/myriverbrandapp/"
           >
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/facebook_uiqfqv.svg"
@@ -179,7 +179,7 @@ export const accountCreationTemplate = (
           <a
             class="icons"
             target="_blank"
-            href=" https://twitter.com/mygatewayapp"
+            href=" https://twitter.com/myriverbrandapp"
           >
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/twitter_ehfdol.svg "
@@ -196,7 +196,7 @@ export const accountCreationTemplate = (
               alt=""
             />
           </a>
-          <a class="icons" target="_blank" href=" https://t.me/gatewayapp">
+          <a class="icons" target="_blank" href=" https://t.me/riverbrandapp">
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/telegram_irjfqw.svg"
               alt=""
@@ -205,7 +205,7 @@ export const accountCreationTemplate = (
           <a
             class="icons"
             target="_blank"
-            href="https://www.linkedin.com/company/gatewayapp/"
+            href="https://www.linkedin.com/company/riverbrandapp/"
           >
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/linkedin_nctdat.svg"

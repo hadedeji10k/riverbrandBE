@@ -17,11 +17,11 @@ export class EmailTemplatesPlugin {
     return {
       [EmailType.ACCOUNT_CREATION]: {
         html: accountCreationTemplate(options),
-        subject: "Welcome to Gateway ✅",
+        subject: "Welcome to RiverBrand ✅",
       },
       [EmailType.USER_FORGET_PASSWORD]: {
         html: userForgetPasswordTemplate(options),
-        subject: "Let's help you get back into Gateway",
+        subject: "Let's help you get back into RiverBrand",
       },
       [EmailType.PASSWORD_CHANGE]: {
         html: passwordChangeTemplate(options),
@@ -39,7 +39,7 @@ export class EmailTemplatesPlugin {
 
     return {
       from: {
-        email: environment.mail.from || "support@gateway.com",
+        email: environment.mail.from || "support@riverbrand.com",
       },
       to: options.recipient,
       subject: template.subject,

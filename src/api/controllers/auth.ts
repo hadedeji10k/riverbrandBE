@@ -23,9 +23,12 @@ export class AuthController {
     const payload: ISignUpPayload = {
       email: body.email.toLowerCase(),
       phone: body.phone,
-      fullName: body.fullName,
+      first_name: body.first_name,
+      username: body.username,
+      last_name: body.last_name,
       password: body.password,
-      referralCode: body.referralCode,
+      country_code: body.country_code,
+      user_referral_code: body.user_referral_code,
     };
 
     const data = await this.authService.signUp(payload);

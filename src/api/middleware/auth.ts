@@ -12,14 +12,13 @@ interface IOptions {
 
 const user = Container.get(User);
 
-const dailyLoginReward = 5;
-
 function userAuth(options: IOptions = {}) {
   return async (request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction) => {
     try {
       const data: { id: number } = await request.jwtVerify();
 
-      const userExists = await user.findById(data.id);
+      const userId = Number(data.id)
+      const userExists = await user.findById(userId);
       if (!userExists) {
         throw new ApiError(Message.userNotFound, 404);
       }
@@ -41,7 +40,7 @@ function ensureEmailConfirmed() {
         throw new ApiError(Message.authenticationRequired, 401);
       }
 
-      if (!user.email) {
+      if (!user.is_active) {
         throw new ApiError(Message.emailConfirmationRequired, 403);
       }
     } catch (e) {
@@ -75,7 +74,7 @@ function ensureUserNotSuspended() {
         throw new ApiError(Message.authenticationRequired, 401);
       }
 
-      if (!user.is_active) {
+      if (!user.access) {
         throw new ApiError(Message.userSuspended, 401);
       }
     } catch (e) {

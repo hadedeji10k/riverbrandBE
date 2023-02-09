@@ -1,9 +1,12 @@
 export interface ISignUpPayload {
-  fullName: string;
-  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
   phone: string;
+  country_code: string;
+  email: string;
   password: string;
-  referralCode?: string;
+  user_referral_code?: string
 }
 
 export interface ISignInPayload {

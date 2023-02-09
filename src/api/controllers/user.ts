@@ -38,14 +38,9 @@ export class UserController {
     const { user }: { [key: string]: any } = request;
 
     const data = {
-      id: user.id,
-      fullName: user.fullName,
-      username: user.username,
-      email: user.email,
-      avatar: user.avatar,
-      interests: user.interests,
-      referralCode: user.myReferralCode,
-      phoneNumberVerified: user.phoneConfirmed,
+      ...user,
+      id: Number(user.id),
+      password: null,
     };
 
     return response.success(reply, {
@@ -200,7 +195,7 @@ export class UserController {
       id: body.userId,
     };
 
-    const data = await this.userService.suspendUser(payload, user);
+    const data = await this.userService.suspendUser(payload);
     return response.success(reply, { message: Message.userSuspendedSuccess, data });
   }
 
@@ -211,7 +206,7 @@ export class UserController {
       id: body.userId,
     };
 
-    const data = await this.userService.unsuspendUser(payload, user);
+    const data = await this.userService.unsuspendUser(payload);
     return response.success(reply, { message: Message.userEnableSuccess, data });
   }
 

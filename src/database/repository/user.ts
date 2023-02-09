@@ -1,7 +1,8 @@
 import { Prisma } from "@prisma/client";
+import { addMinutes } from "date-fns";
 import { Service } from "typedi";
 import { prisma } from "..";
-import { ICreateUserPayload } from "../../interfaces";
+import { ICreateUserPayload, IUser } from "../../interfaces";
 
 interface IFindOptions {
   select?: Prisma.user_userSelect;
@@ -12,22 +13,22 @@ interface IFindOptions {
 export class User {
   async create(payload: ICreateUserPayload) {
     let data: any = {
-      fullName: payload.fullName,
+      first_name: payload.first_name,
+      last_name: payload.last_name,
       email: payload.email,
       phone: payload.phone,
       password: payload.password,
-      emailOtpCode: payload.emailOtpCode,
-      lastDayStreak: payload.lastDayStreak,
-      isReferred: payload.isReferred,
+      username: payload.username || payload.first_name,
+      user_type: "user"
     };
 
-    if (payload.referrerId) {
-      data.referrer = {
-        connect: {
-          id: payload.referrerId,
-        },
-      };
-    }
+    // if (payload.referrerId) {
+    //   data.referrer = {
+    //     connect: {
+    //       id: payload.referrerId,
+    //     },
+    //   };
+    // }
 
     return await prisma.user_user.create({ data });
   }
@@ -81,5 +82,54 @@ export class User {
 
     // @ts-expect-error
     return result ? <number>result._count : 0;
+  }
+
+  async createOrUpdateVerificationCode(user: IUser, type: "email" | "password" | "phone", code: string, valid: boolean) {
+    let data: any = {
+      user_user: { connect: { id: user.id } },
+      code,
+      validity: addMinutes(new Date(), 10),
+      valid
+    };
+
+    let updateData = {
+      code,
+      validity: addMinutes(new Date(), 10),
+      valid
+    }
+
+    if (type === "email" || type === "phone") {
+      const findUser = await prisma.user_usersverification.findFirst({ where: { user_id: user.id } })
+
+      if (findUser) {
+        return await prisma.user_usersverification.update({ where: { id: findUser.id }, data: updateData })
+      } else {
+        return await prisma.user_usersverification.create({ data });
+      }
+    } else if (type === "password") {
+      const findUser = await prisma.user_userpasswordverification.findFirst({ where: { user_id: user.id } })
+
+      if (findUser) {
+        return await prisma.user_userpasswordverification.update({ where: { id: findUser.id }, data: updateData })
+      } else {
+        return await prisma.user_userpasswordverification.create({ data });
+      }
+    }
+
+  }
+
+  async findVerificationCode(user: IUser, type: "email" | "password" | "phone") {
+    let data: {
+      code: string,
+      valid: boolean,
+      validity: Date
+    } | null = null;
+    if (type === "email" || type === "phone") {
+      data = await prisma.user_usersverification.findFirst({ where: { user_id: user.id } })
+    } else if (type === "password") {
+      data = await prisma.user_userpasswordverification.findFirst({ where: { user_id: user.id } })
+    }
+
+    return data
   }
 }

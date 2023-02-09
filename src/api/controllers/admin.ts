@@ -49,13 +49,13 @@ export class AdminController {
     const { query }: { [key: string]: any } = request;
 
     const data = await this.adminService.getConfig(query.keys || "");
-    return response.success(reply, { message: Message.configFetchedSuccessfuly, data });
+    return response.success(reply, { message: Message.configFetchedSuccessfully, data });
   }
 
   public async setConfig(request: FastifyRequest, reply: FastifyReply) {
     const { body }: { [key: string]: any } = request;
 
     const data = await this.adminService.setConfig(body);
-    return response.success(reply, { message: Message.configSetSuccessfuly, data });
+    return response.success(reply, { message: Message.configSetSuccessfully, data });
   }
 }

@@ -4,7 +4,7 @@ import { auth } from "./auth";
 import { user } from "./user";
 
 export async function routes(app: FastifyInstance) {
-  app.get("/", () => ({ message: "Hmmm... Gateway API server" }));
+  app.get("/", () => ({ message: "Hmmm... RiverBrand API server" }));
 
   app.register(admin, { prefix: "admin" });
   app.register(auth, { prefix: "auth" });

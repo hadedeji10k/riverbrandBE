@@ -1,21 +1,26 @@
 export const signUpSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["fullName", "phone", "email", "password"],
+  required: ["email", "phone", "first_name", "username", "last_name", "password", "country_code"],
   properties: {
-    fullName: { type: "string" },
-    phone: { type: "string" },
     email: { type: "string" },
+    phone: { type: "string" },
+    first_name: { type: "string" },
+    username: { type: "string" },
+    last_name: { type: "string" },
     password: { type: "string" },
-    interest: { type: "string" },
-    referralCode: { type: "string" },
+    country_code: { type: "string" },
+    user_referral_code: { type: "string" },
   },
   errorMessage: {
     required: {
       email: "Email is required",
-      fullName: "Full name is required",
       phone: "Phone number is required",
+      first_name: "First name is required",
+      username: "Username is required",
+      last_name: "Last name is required",
       password: "Password is required",
+      country_code: "Country Code is required"
     },
   },
 };

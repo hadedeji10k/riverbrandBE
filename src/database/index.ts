@@ -11,8 +11,6 @@ prisma.$use(async (params, next) => {
         const where = params.args["where"] || {};
         params.args["where"] = {
           ...where,
-          isDeleted: false,
-          deletedAt: null,
         };
       }
       break;
@@ -23,8 +21,6 @@ prisma.$use(async (params, next) => {
         const data = params.args["data"] || {};
         params.args["data"] = {
           ...data,
-          isDeleted: true,
-          deletedAt: new Date(),
         };
       }
       break;
@@ -35,8 +31,6 @@ prisma.$use(async (params, next) => {
         const data = params.args["data"] || {};
         params.args["data"] = {
           ...data,
-          isDeleted: true,
-          deletedAt: new Date(),
         };
       }
       break;

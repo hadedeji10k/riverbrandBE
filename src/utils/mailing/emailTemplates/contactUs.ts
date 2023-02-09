@@ -8,7 +8,7 @@ export const contactUsTemplate = (
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gateway - Account created</title>
+    <title>RiverBrand - Account created</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -83,7 +83,7 @@ export const contactUsTemplate = (
   <body>
     <div class="main">
       <div class="logo">
-        <h2>Gateway</h2>
+        <h2>RiverBrand</h2>
       </div>
       <hr class="line" />
 
@@ -100,7 +100,7 @@ export const contactUsTemplate = (
 
         <p>
           If you have any complaints, please contact our <b>support</b> <br />
-          or send us an email <b>support@gateway.com</b>
+          or send us an email <b>support@riverbrand.com</b>
         </p>
       </main>
       <hr class="line" />
@@ -160,7 +160,7 @@ export const contactUsTemplate = (
           </a>
         </p>
 
-        <p>🖤 The Gateway Team</p>
+        <p>🖤 The RiverBrand Team</p>
       </footer>
     </div>
   </body>

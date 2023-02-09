@@ -662,14 +662,14 @@ model user_user {
   id                                                                BigInt                          @id @default(autoincrement())
   password                                                          String                          @db.VarChar(128)
   last_login                                                        DateTime?                       @db.Timestamptz(6)
-  is_superuser                                                      Boolean
+  is_superuser                                                      Boolean                         @default(false)
   username                                                          String                          @unique @db.VarChar(150)
   first_name                                                        String                          @db.VarChar(150)
   last_name                                                         String                          @db.VarChar(150)
   email                                                             String                          @db.VarChar(254)
-  is_staff                                                          Boolean
-  is_active                                                         Boolean
-  date_joined                                                       DateTime                        @db.Timestamptz(6)
+  is_staff                                                          Boolean                         @default(false)
+  is_active                                                         Boolean                         @default(false)
+  date_joined                                                       DateTime                        @default(now()) @db.Timestamptz(6)
   phone                                                             String                          @db.VarChar(20)
   address                                                           String?                         @db.VarChar(100)
   user_type                                                         String                          @db.VarChar(10)
@@ -678,10 +678,10 @@ model user_user {
   bvn                                                               String?                         @unique(map: "user_user_bvn_4af35fa3_uniq") @db.VarChar(20)
   dob                                                               DateTime?                       @db.Date
   nin                                                               String?                         @unique(map: "user_user_nin_7a3b2c8e_uniq") @db.VarChar(20)
-  access                                                            Boolean
+  access                                                            Boolean                         @default(false)
   employment                                                        Json?
   id_type                                                           String?                         @db.VarChar(50)
-  kyc_completed                                                     Boolean
+  kyc_completed                                                     Boolean                         @default(false)
   remark                                                            String?
   bank                                                              Json?
   maiden_name                                                       String?                         @db.VarChar(40)
@@ -699,13 +699,13 @@ model user_user {
   doc_nin                                                           String?                         @db.VarChar(100)
   doc_passport                                                      String?                         @db.VarChar(100)
   doc_signature                                                     String?                         @db.VarChar(100)
-  is_bank_completed                                                 Boolean
-  is_bvn_added                                                      Boolean
-  is_bvn_verified                                                   Boolean
-  is_document_completed                                             Boolean
-  is_employment_completed                                           Boolean
-  is_next_of_kin_completed                                          Boolean
-  is_personal_completed                                             Boolean
+  is_bank_completed                                                 Boolean                         @default(false)
+  is_bvn_added                                                      Boolean                         @default(false)
+  is_bvn_verified                                                   Boolean                         @default(false)
+  is_document_completed                                             Boolean                         @default(false)
+  is_employment_completed                                           Boolean                         @default(false)
+  is_next_of_kin_completed                                          Boolean                         @default(false)
+  is_personal_completed                                             Boolean                         @default(false)
   landmark                                                          String?                         @db.VarChar(100)
   next_email                                                        String?                         @db.VarChar(100)
   next_last_name                                                    String?                         @db.VarChar(40)
@@ -803,7 +803,7 @@ model user_usersverification {
   id        BigInt    @id @default(autoincrement())
   code      String    @db.VarChar(10)
   validity  DateTime  @db.Timestamptz(6)
-  valid     Boolean
+  valid     Boolean   @default(false)
   user_id   BigInt
   user_user user_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_usersverification_user_id_adbd7ded_fk_user_user_id")
 

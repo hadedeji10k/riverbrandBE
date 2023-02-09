@@ -8,7 +8,7 @@ export const userForgetPasswordTemplate = (
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gateway - Account created</title>
+    <title>RiverBrand - Account created</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -170,14 +170,14 @@ export const userForgetPasswordTemplate = (
 
         <p>
           If you have any complaints, please contact our support or send us an
-          email <span>support@gatewayapp.co</span>
+          email <span>support@riverbrandapp.co</span>
         </p>
 
         <p class="iconContainer">
           <a
             class="icons"
             target="_blank"
-            href="https://www.facebook.com/mygatewayapp/"
+            href="https://www.facebook.com/myriverbrandapp/"
           >
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/facebook_uiqfqv.svg"
@@ -187,7 +187,7 @@ export const userForgetPasswordTemplate = (
           <a
             class="icons"
             target="_blank"
-            href=" https://twitter.com/mygatewayapp"
+            href=" https://twitter.com/myriverbrandapp"
           >
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/twitter_ehfdol.svg "
@@ -200,7 +200,7 @@ export const userForgetPasswordTemplate = (
               alt=""
             />
           </a>
-          <a class="icons" target="_blank" href=" https://t.me/gatewayapp">
+          <a class="icons" target="_blank" href=" https://t.me/riverbrandapp">
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/telegram_irjfqw.svg"
               alt=""
@@ -209,7 +209,7 @@ export const userForgetPasswordTemplate = (
           <a
             class="icons"
             target="_blank"
-            href="https://www.linkedin.com/company/gatewayapp/"
+            href="https://www.linkedin.com/company/riverbrandapp/"
           >
             <img
               src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/linkedin_nctdat.svg"

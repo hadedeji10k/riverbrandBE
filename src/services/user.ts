@@ -57,7 +57,7 @@ export class UserService {
 
     const otpCode = generateOTP({ type: "num", length: 6 });
 
-    const body = `Your One Time Password (OTP) for Gateway phone number verification is ${otpCode}. Expires in 10 mins. If you did not request for this, kindly ignore this message. NOTE: Do not share your OTP with anyone.`;
+    const body = `Your One Time Password (OTP) for RiverBrand phone number verification is ${otpCode}. Expires in 10 mins. If you did not request for this, kindly ignore this message. NOTE: Do not share your OTP with anyone.`;
 
     await this.sms.send({
       body,
@@ -91,7 +91,7 @@ export class UserService {
     if (user.phone) {
       const otpCode = generateOTP({ type: "num", length: 6 });
 
-      const body = `Your One Time Password (OTP) for Gateway phone number verification is ${otpCode}. Expires in 10 mins. If you did not request for this, kindly ignore this message. NOTE: Do not share your OTP with anyone.`;
+      const body = `Your One Time Password (OTP) for RiverBrand phone number verification is ${otpCode}. Expires in 10 mins. If you did not request for this, kindly ignore this message. NOTE: Do not share your OTP with anyone.`;
 
       await this.sms.send({
         body,
@@ -250,34 +250,34 @@ export class UserService {
     };
   }
 
-  public async suspendUser(payload: ISuspendUser, user: IUser) {
+  public async suspendUser(payload: ISuspendUser) {
     {
       const user = await this.user.findById(payload.id);
       if (!user) throw new ApiError(Message.userNotFound, 404);
 
-      if (!user.is_active) throw new ApiError(Message.userAlreadySuspended, 400);
+      if (!user.access) throw new ApiError(Message.userAlreadySuspended, 400);
     }
 
     await this.user.updateUser(
       { id: payload.id },
       {
-        is_active: false,
+        access: false,
       }
     );
   }
 
-  public async unsuspendUser(payload: IUnsuspendUser, user: IUser) {
+  public async unsuspendUser(payload: IUnsuspendUser) {
     {
       const user = await this.user.findById(payload.id);
       if (!user) throw new ApiError(Message.userNotFound, 404);
 
-      if (user.is_active) throw new ApiError(Message.userAlreadyEnabled, 400);
+      if (user.access) throw new ApiError(Message.userAlreadyEnabled, 400);
     }
 
     await this.user.updateUser(
       { id: payload.id },
       {
-        is_active: true,
+        access: true,
       }
     );
   }

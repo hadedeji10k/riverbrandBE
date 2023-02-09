@@ -1,14 +1,14 @@
 import { user_user as User } from "@prisma/client";
 
 export interface ICreateUserPayload {
-  fullName: string;
-  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
   phone: string;
+  country_code: string;
+  email: string;
   password: string;
-  emailOtpCode: string;
-  lastDayStreak: Date;
-  isReferred?: boolean;
-  referrerId?: string;
+  user_referral_code?: string
 }
 
 export interface ICompleteProfilePayload {

@@ -17,7 +17,7 @@ import {
 } from "../interfaces";
 import { Mailer } from "../utils/mailing";
 import { environment } from "../config/environment";
-import { startOfDay } from "date-fns";
+import { isFuture, startOfDay } from "date-fns";
 
 @Service()
 export class AuthService {
@@ -37,21 +37,26 @@ export class AuthService {
       throw new ApiError(Message.phoneAlreadyRegistered, 409);
     }
 
+    const usernameExist = await this.user.findByUsername(payload.username || payload.first_name);
+    if (usernameExist) {
+      throw new ApiError(Message.usernameAlreadyExists, 409);
+    }
+
     const passwordHash = await password.hash(payload.password);
     const otpCode = generateOTP({ type: "num", length: 6 });
 
+
     const user = await this.user.create({
       ...payload,
-      isReferred: payload.referralCode?.toLowerCase() ? true : false,
       password: passwordHash,
-      emailOtpCode: otpCode,
-      lastDayStreak: startOfDay(new Date()),
     });
+
+    await this.user.createOrUpdateVerificationCode(user, "email", otpCode, true);
 
     await this._sendEmailConfirmation(user, otpCode);
 
     return {
-      token: await jwt.sign({ id: user.id }),
+      token: await jwt.sign({ id: Number(user.id) }),
     };
   }
 
@@ -75,12 +80,8 @@ export class AuthService {
       throw new ApiError(Message.invalidPassword, 400);
     }
 
-    // if (user.role !== "ADMIN") {
-    //   throw new ApiError(Message.signInUserNotAdmin, 401);
-    // }
-
     return {
-      token: await jwt.sign({ id: user.id }),
+      token: await jwt.sign({ id: Number(user.id) }),
     };
   }
 
@@ -90,9 +91,9 @@ export class AuthService {
       throw new ApiError(Message.userNotFound, 401);
     }
 
-    if (!user.is_active) {
-      throw new ApiError(Message.userSuspended, 401);
-    }
+    // if (!user.is_active) {
+    //   throw new ApiError(Message.userSuspended, 401);
+    // }
 
     if (!user.email) {
       throw new ApiError(Message.emailNotVerified, 403);
@@ -103,8 +104,10 @@ export class AuthService {
       throw new ApiError(Message.invalidPassword, 400);
     }
 
+    await this.user.updateUser({ id: user.id }, { last_login: new Date() })
+
     return {
-      token: await jwt.sign({ id: user.id }),
+      token: await jwt.sign({ id: Number(user.id) }),
     };
   }
 
@@ -115,7 +118,7 @@ export class AuthService {
     }
 
     const otpCode = generateOTP({ type: "num", length: 6 });
-    // await this.user.updateUser({ id: user.id }, { passwordOtpCode: otpCode });
+    await this.user.createOrUpdateVerificationCode(user, "password", otpCode, true);
 
     const options: EmailOptions = {
       recipient: user.email,
@@ -137,9 +140,15 @@ export class AuthService {
       throw new ApiError(Message.userNotFound, 404);
     }
 
-    // if (user.passwordOtpCode !== payload.otpCode) {
-    //   throw new ApiError(Message.invalidOtp, 400);
-    // }
+    const codeDetails = await this.user.findVerificationCode(user, "password")
+
+    if (!isFuture(codeDetails?.validity || new Date())) {
+      throw new ApiError(Message.otpExpired, 400);
+    }
+
+    if (codeDetails?.code !== payload.otpCode) {
+      throw new ApiError(Message.invalidOtp, 400);
+    }
 
     if (await password.verify(payload.password, user.password)) {
       throw new ApiError(Message.passwordIsSameAsOld, 400);
@@ -152,6 +161,7 @@ export class AuthService {
         password: passwordHash,
       }
     );
+    await this.user.createOrUpdateVerificationCode(user, "password", "", false);
 
     const options: EmailOptions = {
       recipient: user.email,
@@ -206,8 +216,8 @@ export class AuthService {
     if (!user) {
       throw new ApiError("Email has not been registered", 404);
     }
-    if (user.email) {
-      throw new ApiError("Email has already been confirmed", 409);
+    if (user.is_active) {
+      throw new ApiError(Message.emailAlreadyConfirmed, 409);
     }
 
     await this._sendEmailConfirmation(user);
@@ -217,29 +227,36 @@ export class AuthService {
     const user = await this.user.findByEmail(payload.email);
 
     if (!user) {
-      throw new ApiError("User does not exists", 404);
+      throw new ApiError(Message.userNotFound, 404);
     }
-    // if (!user.emailOtpCode) {
-    //   throw new ApiError("Email confirmation token is invalid", 400);
-    // }
+    if (user.is_active) {
+      throw new ApiError(Message.emailAlreadyConfirmed, 409);
+    }
 
-    // if (payload.otpCode !== user.emailOtpCode) {
-    //   throw new ApiError("Email confirmation token is invalid", 400);
-    // }
+    const codeDetails = await this.user.findVerificationCode(user, "email")
+
+    if (!isFuture(codeDetails?.validity || new Date())) {
+      throw new ApiError(Message.otpExpired, 400);
+    }
+
+    if (codeDetails?.code !== payload.otpCode) {
+      throw new ApiError(Message.invalidOtp, 400);
+    }
 
     await this.user.updateUser(
       { id: user.id },
       {
-        // emailConfirmed: true,
-        // emailOtpCode: null,
+        is_active: true,
       }
     );
+
+    await this.user.createOrUpdateVerificationCode(user, "email", "", false);
   }
 
   private async _sendEmailConfirmation(user: IUser, otpCode?: string | null) {
     if (!otpCode) {
       otpCode = generateOTP({ type: "num", length: 6 });
-      // await this.user.updateUser({ id: user.id }, { emailOtpCode: otpCode });
+      await this.user.createOrUpdateVerificationCode(user, "email", otpCode, true);
     }
 
     const options: EmailOptions = {
@@ -255,7 +272,7 @@ export class AuthService {
 
   public async contactUsForm(payload: IContactUsPayload) {
     const options: EmailOptions = {
-      recipient: "info@gatewayapp.co",
+      recipient: "info@riverbrandapp.co",
       context: {
         name: payload.name.split(" ")[0],
         message: payload.message,

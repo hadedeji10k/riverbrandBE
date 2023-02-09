@@ -78,7 +78,7 @@ export const passwordChangeTemplate = (
   <body>
     <div class="main">
       <div class="logo">
-        <h2>Gateway</h2>
+        <h2>RiverBrand</h2>
       </div>
       <hr class="line" />
 
@@ -94,9 +94,9 @@ export const passwordChangeTemplate = (
         </p>
     
         <p>
-            You are receiving this email because someone has change your password for your Gateway account.
+            You are receiving this email because someone has change your password for your RiverBrand account.
     
-            If you feel this was an error please contact <b>Gateway Team</b> immediately
+            If you feel this was an error please contact <b>RiverBrand Team</b> immediately
         </p>
       </main>
       <hr class="line" />
@@ -156,7 +156,7 @@ export const passwordChangeTemplate = (
           </a>
         </p>
 
-        <p>🖤 The Gateway Team</p>
+        <p>🖤 The RiverBrand Team</p>
       </footer>
     </div>
 
