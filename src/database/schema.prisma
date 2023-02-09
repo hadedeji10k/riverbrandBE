@@ -134,7 +134,7 @@ model django_session {
 model loan_collateral {
   id                         String        @id @db.Uuid
   loan_id                    String        @db.Uuid
-  user_email                 String        @unique @db.VarChar(254)
+  user_email                 String        @db.VarChar(100)
   user_type                  String        @db.VarChar(30)
   vehicle_address            String        @db.VarChar(500)
   vehicle_brand              String        @db.VarChar(150)
@@ -151,8 +151,7 @@ model loan_collateral {
   date_updated               DateTime      @db.Date
   loan_userloan              loan_userloan @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_collateral_loan_id_03327384_fk_loan_userloan_id")
 
-  @@index([loan_id], map: "loan_collateral_loan_id_03327384")
-  @@index([user_email], map: "loan_collateral_user_email_004407d1_like")
+  @@unique([loan_id, user_email], map: "loan_collateral_loan_id_user_email_56ba49af_uniq")
 }
 
 model loan_documents {
@@ -187,8 +186,8 @@ model loan_guarantor {
   guarantee             Json?
   investments           Json?
   land_buildings        Json?
-  date_created          DateTime            @db.Date
-  date_updated          DateTime            @db.Date
+  date_created          DateTime            @db.Timestamptz(6)
+  date_updated          DateTime            @db.Timestamptz(6)
   loan_userloan         loan_userloan       @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_guarantor_loan_id_474dd61b_fk_loan_userloan_id")
   loan_japaplusloan     loan_japaplusloan[]
 
@@ -209,12 +208,15 @@ model loan_japaplusloan {
   obligor_signature         String?        @db.VarChar(100)
   signature                 String         @db.VarChar(100)
   vehicle_collateral        String?        @db.VarChar(100)
+  payment_ref               String?        @unique @db.VarChar(64)
+  is_paid_tracker           Boolean
   loan_guarantor            loan_guarantor @relation(fields: [cheque_collateral_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_japaplusloan_cheque_collateral_id_3abedd4f_fk_loan_guar")
   loan_userloan             loan_userloan  @relation(fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_japaplusloan_loan_id_f965b7aa_fk_loan_userloan_id")
   user_user                 user_user?     @relation(fields: [obligor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loan_japaplusloan_obligor_id_5614b0ad_fk_user_user_id")
 
   @@index([cheque_collateral_id], map: "loan_japaplusloan_cheque_collateral_id_3abedd4f")
   @@index([obligor_id], map: "loan_japaplusloan_obligor_id_5614b0ad")
+  @@index([payment_ref], map: "loan_japaplusloan_payment_ref_b936ba6f_like")
 }
 
 model loan_loanispodocument {
@@ -662,14 +664,14 @@ model user_user {
   id                                                                BigInt                          @id @default(autoincrement())
   password                                                          String                          @db.VarChar(128)
   last_login                                                        DateTime?                       @db.Timestamptz(6)
-  is_superuser                                                      Boolean                         @default(false)
+  is_superuser                                                      Boolean
   username                                                          String                          @unique @db.VarChar(150)
   first_name                                                        String                          @db.VarChar(150)
   last_name                                                         String                          @db.VarChar(150)
   email                                                             String                          @db.VarChar(254)
-  is_staff                                                          Boolean                         @default(false)
-  is_active                                                         Boolean                         @default(false)
-  date_joined                                                       DateTime                        @default(now()) @db.Timestamptz(6)
+  is_staff                                                          Boolean
+  is_active                                                         Boolean
+  date_joined                                                       DateTime                        @db.Timestamptz(6)
   phone                                                             String                          @db.VarChar(20)
   address                                                           String?                         @db.VarChar(100)
   user_type                                                         String                          @db.VarChar(10)
@@ -678,10 +680,10 @@ model user_user {
   bvn                                                               String?                         @unique(map: "user_user_bvn_4af35fa3_uniq") @db.VarChar(20)
   dob                                                               DateTime?                       @db.Date
   nin                                                               String?                         @unique(map: "user_user_nin_7a3b2c8e_uniq") @db.VarChar(20)
-  access                                                            Boolean                         @default(false)
+  access                                                            Boolean
   employment                                                        Json?
   id_type                                                           String?                         @db.VarChar(50)
-  kyc_completed                                                     Boolean                         @default(false)
+  kyc_completed                                                     Boolean
   remark                                                            String?
   bank                                                              Json?
   maiden_name                                                       String?                         @db.VarChar(40)
@@ -699,13 +701,13 @@ model user_user {
   doc_nin                                                           String?                         @db.VarChar(100)
   doc_passport                                                      String?                         @db.VarChar(100)
   doc_signature                                                     String?                         @db.VarChar(100)
-  is_bank_completed                                                 Boolean                         @default(false)
-  is_bvn_added                                                      Boolean                         @default(false)
-  is_bvn_verified                                                   Boolean                         @default(false)
-  is_document_completed                                             Boolean                         @default(false)
-  is_employment_completed                                           Boolean                         @default(false)
-  is_next_of_kin_completed                                          Boolean                         @default(false)
-  is_personal_completed                                             Boolean                         @default(false)
+  is_bank_completed                                                 Boolean
+  is_bvn_added                                                      Boolean
+  is_bvn_verified                                                   Boolean
+  is_document_completed                                             Boolean
+  is_employment_completed                                           Boolean
+  is_next_of_kin_completed                                          Boolean
+  is_personal_completed                                             Boolean
   landmark                                                          String?                         @db.VarChar(100)
   next_email                                                        String?                         @db.VarChar(100)
   next_last_name                                                    String?                         @db.VarChar(40)
@@ -803,7 +805,7 @@ model user_usersverification {
   id        BigInt    @id @default(autoincrement())
   code      String    @db.VarChar(10)
   validity  DateTime  @db.Timestamptz(6)
-  valid     Boolean   @default(false)
+  valid     Boolean
   user_id   BigInt
   user_user user_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_usersverification_user_id_adbd7ded_fk_user_user_id")
 
