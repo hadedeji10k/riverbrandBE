@@ -7,6 +7,7 @@
     "build": "tsc",
     "dev": "nodemon",
     "prisma:push": "prisma db push",
+    "deploy": "yarn build && yarn start",
     "test": "yarn build && tap --no-check-coverage --no-coverage-report ./dist/tests/index.js",
     "start": "node -r dotenv/config ./dist"
   },
