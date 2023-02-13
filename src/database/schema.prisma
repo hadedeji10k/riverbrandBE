@@ -293,7 +293,7 @@ model loan_userloan {
   tenure                                                                       Int
   tenure_type                                                                  String                     @db.VarChar(6)
   repay_count                                                                  Int?
-  interest_rate                                                                Int?
+  interest_rate                                                                Decimal?                   @db.Decimal(20, 2)
   interest_amount                                                              Decimal?                   @db.Decimal(20, 2)
   per_installment                                                              Decimal?                   @db.Decimal(20, 2)
   re_payable_amount                                                            Decimal?                   @db.Decimal(20, 2)
