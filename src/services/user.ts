@@ -8,6 +8,11 @@ import {
   ISuspendUser,
   IUpdatePassword,
   IUser,
+  ISetTransactionPin,
+  IUpdateTransactionPin,
+  EmailOptions,
+  EmailType,
+  IForgotPinReset,
 } from "../interfaces";
 import {
   IRequestPhoneNumberVerification,
@@ -20,13 +25,15 @@ import { ApiError, generateOTP, Message, password, Sms } from "../utils";
 import { environment } from "../config/environment";
 import { addMinutes, isFuture, startOfDay } from "date-fns";
 import { dateInterval } from "../utils/dateInterval";
+import { Mailer } from "../utils/mailing";
 
 @Service()
 export class UserService {
   constructor(
     private readonly user: User,
     private readonly sms: Sms,
-    private readonly config: Config
+    private readonly mail: Mailer,
+    private readonly config: Config,
   ) { }
 
   public async completeProfile(payload: ICompleteProfilePayload, user: IUser) {
@@ -189,6 +196,86 @@ export class UserService {
     return;
   }
 
+  public async setUserPin(payload: ISetTransactionPin, user: IUser) {
+    const userPin = await this.user.findUserPin({ user_id: user.id });
+
+    if (userPin?.pin) {
+      throw new ApiError(Message.pinAlreadySet, 409)
+    }
+
+    await this.user.createOrUpdateTransactionPin(user, payload.pin);
+    return
+  }
+
+  public async updateUserPin(payload: IUpdateTransactionPin, user: IUser) {
+    const userPin = await this.user.findUserPin({ user_id: user.id });
+
+    if (userPin?.pin !== payload.oldPin) {
+      throw new ApiError(Message.oldTransactionPinIsIncorrect, 409)
+    }
+
+    if (userPin?.pin === payload.newPin) {
+      throw new ApiError(Message.oldSameAsNewTransactionPin, 409)
+    }
+
+    await this.user.createOrUpdateTransactionPin(user, payload.newPin);
+
+    return
+  }
+
+  public async requestForgotTransactionPin(user: IUser) {
+    const userPin = await this.user.findUserPin({ user_id: user.id });
+
+    if (!userPin?.pin) {
+      throw new ApiError(Message.noPinSet, 409)
+    }
+
+    const otpCode = generateOTP({ type: "num", length: 6 });
+    await this.user.createOrUpdateVerificationCode(user, "pin", otpCode, true);
+
+    const options: EmailOptions = {
+      recipient: user.email,
+      context: {
+        name: user.first_name,
+        activationCode: parseInt(otpCode),
+      },
+    };
+    await this.mail.sendEmail(EmailType.USER_FORGET_PIN, options);
+
+    return
+  }
+
+  public async resetForgotTransactionPin(payload: IForgotPinReset, user: IUser) {
+
+    const codeDetails = await this.user.findVerificationCode(user, "pin")
+
+    if (!isFuture(codeDetails?.validity || new Date())) {
+      throw new ApiError(Message.otpExpired, 400);
+    }
+
+    if (!codeDetails?.valid) {
+      throw new ApiError(Message.otpUsed, 400);
+    }
+
+    if (codeDetails?.code !== payload.otpCode) {
+      throw new ApiError(Message.invalidOtp, 400);
+    }
+
+    await this.user.createOrUpdateTransactionPin(user, payload.pin)
+    await this.user.createOrUpdateVerificationCode(user, "pin", codeDetails?.code, false);
+
+    const options: EmailOptions = {
+      recipient: user.email,
+      context: {
+        name: user.first_name,
+      },
+    };
+
+    await this.mail.sendEmail(EmailType.PIN_CHANGE, options);
+
+    return;
+  }
+
   public async makeUserAdmin(payload: { email: string }) {
     const user = await this.user.findByEmail(payload.email);
     if (!user) {
@@ -210,6 +297,33 @@ export class UserService {
   public async getUserData(userId: number) {
 
     return await this.user.findById(userId);
+  }
+
+  public async getCurrentUser(user: IUser) {
+    const userHasPin = await this.user.findUserPin({ user_id: user.id });
+
+    const data = {
+      id: Number(user.id),
+      avatar: user.avatar,
+      date_joined: user.date_joined,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      username: user.username,
+      phone: user.phone,
+      nin: user.nin,
+      access: user.access,
+      is_active: user.is_active,
+      user_type: user.user_type,
+      is_personal_completed: user.is_personal_completed,
+      kyc_completed: user.kyc_completed,
+      is_superuser: user.is_superuser,
+      is_staff: user.is_staff,
+      last_login: user.last_login,
+      has_pin: userHasPin?.pin ? true : false,
+    };
+
+    return data
   }
 
   public async getUserStatistics() {

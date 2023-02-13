@@ -114,7 +114,7 @@ export const passwordChangeTemplate = (
             href="https://web.facebook.com/"
           >
             <img
-              src="https://github.com/MunaWallet/assets/blob/main/logos/facebook-brands.png?raw=true"
+              src=""
               alt=""
             />
           </a>
@@ -124,7 +124,7 @@ export const passwordChangeTemplate = (
             href="https://twitter.com/"
           >
             <img
-              src="https://github.com/MunaWallet/assets/blob/main/logos/twitter-brands.png?raw=true"
+              src=""
               alt=""
             />
           </a>
@@ -134,13 +134,13 @@ export const passwordChangeTemplate = (
             href="https://instagram.com"
           >
             <img
-              src="https://github.com/MunaWallet/assets/blob/main/logos/square-instagram-brands.png?raw=true"
+              src=""
               alt=""
             />
           </a>
           <a class="icons" target="_blank" href="https://t.me">
             <img
-              src="https://github.com/MunaWallet/assets/blob/main/logos/telegram-brands.png?raw=true"
+              src=""
               alt=""
             />
           </a>
@@ -150,7 +150,7 @@ export const passwordChangeTemplate = (
             href="https://www.linkedin.com/company/"
           >
             <img
-              src="https://github.com/MunaWallet/assets/blob/main/logos/linkedin-brands.png?raw=true"
+              src=""
               alt=""
             />
           </a>

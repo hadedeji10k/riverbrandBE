@@ -97,6 +97,52 @@ export const updateUserPasswordSchema = {
   },
 };
 
+export const setUserPinSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["pin"],
+  properties: {
+    pin: { type: "string" },
+  },
+  errorMessage: {
+    required: {
+      pin: "Pin is required",
+    },
+  },
+};
+
+export const updateUserPinSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["oldPin", "newPin"],
+  properties: {
+    oldPin: { type: "string" },
+    newPin: { type: "string" },
+  },
+  errorMessage: {
+    required: {
+      oldPin: "Old Pin is required",
+      newPin: "New Pin is required",
+    },
+  },
+};
+
+export const resetForgotTransactionPinSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["otpCode", "pin"],
+  properties: {
+    otpCode: { type: "string" },
+    pin: { type: "string" },
+  },
+  errorMessage: {
+    required: {
+      otpCode: "OTP code is required",
+      pin: "Pin is required",
+    },
+  },
+};
+
 export const makeUserAdminSchema = {
   type: "object",
   additionalProperties: false,

@@ -1,6 +1,6 @@
 import { EmailOptions } from "../../../interfaces";
 
-export const contactUsTemplate = (
+export const pinChangeTemplate = (
   { context }: Pick<EmailOptions, "context">,
 ) => `
 <!DOCTYPE html>
@@ -8,10 +8,7 @@ export const contactUsTemplate = (
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RiverBrand - Account created</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Document</title>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@100;200;300;500;700&display=swap");
 
@@ -62,20 +59,18 @@ export const contactUsTemplate = (
       }
       .icons {
         text-decoration: none;
+        font-size: 2rem;
+        color: gray;
+        margin-right: 20px;
+      }
+      .icons {
+        text-decoration: none;
         color: gray;
         margin-right: 20px;
       }
       .icons img {
         width: 25px;
         height: 25px;
-      }
-      .code {
-        background: #4caf50;
-        color: #fff;
-        border-radius: 15px;
-        padding: 10px;
-        font-size: 1.2rem;
-        font-weight: bold;
       }
     </style>
   </head>
@@ -88,19 +83,20 @@ export const contactUsTemplate = (
       <hr class="line" />
 
       <section>
-        <h1 class="title">A message from: ${context.email}</h1>
-        <h1 class="title">Name: ${context.name}</h1>
+        <h1 class="title">Dear ${context.name} </h1>
       </section>
       <main>
+        <h3>Transaction Pin updated!</h3>
+    
         <p>
-            The message is as follows:
+            We’ve changed your transaction pin, as you asked. To view or change your account information,
+            visit your account settings page.
         </p>
-
-        <p>${context.message}</p>
-
+    
         <p>
-          If you have any complaints, please contact our <b>support</b> <br />
-          or send us an email <b>support@riverbrand.com</b>
+            You are receiving this email because someone has change your transaction pin for your RiverBrand account.
+    
+            If you feel this was an error please contact <b>RiverBrand Team</b> immediately
         </p>
       </main>
       <hr class="line" />
@@ -135,14 +131,14 @@ export const contactUsTemplate = (
           <a
             class="icons"
             target="_blank"
-            href="https://instagram.com/"
+            href="https://instagram.com"
           >
             <img
               src=""
               alt=""
             />
           </a>
-          <a class="icons" target="_blank" href="https://t.me/">
+          <a class="icons" target="_blank" href="https://t.me">
             <img
               src=""
               alt=""
@@ -163,6 +159,11 @@ export const contactUsTemplate = (
         <p>🖤 The RiverBrand Team</p>
       </footer>
     </div>
+
+    <script
+      src="https://kit.fontawesome.com/37f4fd33b5.js"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>
 `;

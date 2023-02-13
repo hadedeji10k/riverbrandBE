@@ -31,6 +31,20 @@ export interface ISetProfilePicture {
   imageUrl: string;
 }
 
+export interface ISetTransactionPin {
+  pin: string;
+}
+
+export interface IUpdateTransactionPin {
+  oldPin: string;
+  newPin: string;
+}
+
+export interface IForgotPinReset {
+  otpCode: string;
+  pin: string;
+}
+
 export interface IUpdatePassword {
   newPassword: string;
   oldPassword: string;

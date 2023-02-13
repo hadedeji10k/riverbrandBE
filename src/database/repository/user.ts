@@ -84,7 +84,7 @@ export class User {
     return result ? <number>result._count : 0;
   }
 
-  async createOrUpdateVerificationCode(user: IUser, type: "email" | "password" | "phone", code: string, valid: boolean) {
+  async createOrUpdateVerificationCode(user: IUser, type: "email" | "password" | "phone" | "pin", code: string, valid: boolean) {
     let data: any = {
       user_user: { connect: { id: user.id } },
       code,
@@ -114,11 +114,19 @@ export class User {
       } else {
         return await prisma.user_userpasswordverification.create({ data });
       }
+    } else if (type === "pin") {
+      const findUser = await prisma.user_userspinverification.findFirst({ where: { user_id: user.id } })
+
+      if (findUser) {
+        return await prisma.user_userspinverification.update({ where: { id: findUser.id }, data: updateData })
+      } else {
+        return await prisma.user_userspinverification.create({ data });
+      }
     }
 
   }
 
-  async findVerificationCode(user: IUser, type: "email" | "password" | "phone") {
+  async findVerificationCode(user: IUser, type: "email" | "password" | "phone" | "pin") {
     let data: {
       code: string,
       valid: boolean,
@@ -128,8 +136,33 @@ export class User {
       data = await prisma.user_usersverification.findFirst({ where: { user_id: user.id } })
     } else if (type === "password") {
       data = await prisma.user_userpasswordverification.findFirst({ where: { user_id: user.id } })
+    } else if (type === "pin") {
+      data = await prisma.user_userspinverification.findFirst({ where: { user_id: user.id } })
     }
 
     return data
+  }
+
+  async findUserPin(where: Prisma.user_transaction_pinWhereInput, options?: any) {
+    return await prisma.user_transaction_pin.findFirst({ where: { ...where }, ...options });
+  }
+
+  async createOrUpdateTransactionPin(user: IUser, pin: string) {
+    let data: any = {
+      user_user: { connect: { id: user.id } },
+      pin,
+    };
+
+    let updateData = {
+      pin
+    }
+
+    const findUser = await this.findUserPin({ user_id: user.id })
+
+    if (findUser) {
+      return await prisma.user_transaction_pin.update({ where: { id: findUser.id }, data: updateData })
+    } else {
+      return await prisma.user_transaction_pin.create({ data });
+    }
   }
 }

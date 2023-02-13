@@ -3,7 +3,9 @@ import {
   accountCreationTemplate,
   passwordChangeTemplate,
   userForgetPasswordTemplate,
-  contactUsTemplate
+  contactUsTemplate,
+  userForgetPinTemplate,
+  pinChangeTemplate
 } from "./emailTemplates";
 import { EmailOptions, EmailTemplate, EmailType } from "../../interfaces";
 import { environment } from "../../config";
@@ -18,6 +20,14 @@ export class EmailTemplatesPlugin {
       [EmailType.ACCOUNT_CREATION]: {
         html: accountCreationTemplate(options),
         subject: "Welcome to RiverBrand ✅",
+      },
+      [EmailType.USER_FORGET_PIN]: {
+        html: userForgetPinTemplate(options),
+        subject: "Let's help you retrieve your pin",
+      },
+      [EmailType.PIN_CHANGE]: {
+        html: pinChangeTemplate(options),
+        subject: "Transaction Pin Changed",
       },
       [EmailType.USER_FORGET_PASSWORD]: {
         html: userForgetPasswordTemplate(options),

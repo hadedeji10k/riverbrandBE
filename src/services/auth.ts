@@ -1,5 +1,4 @@
 import { Service } from "typedi";
-import axios from "axios";
 import { ApiError, generateOTP, jwt, Message, password } from "../utils";
 import { User } from "../database/repository";
 import {
@@ -146,6 +145,10 @@ export class AuthService {
       throw new ApiError(Message.otpExpired, 400);
     }
 
+    if (!codeDetails?.valid) {
+      throw new ApiError(Message.otpUsed, 400);
+    }
+
     if (codeDetails?.code !== payload.otpCode) {
       throw new ApiError(Message.invalidOtp, 400);
     }
@@ -161,7 +164,7 @@ export class AuthService {
         password: passwordHash,
       }
     );
-    await this.user.createOrUpdateVerificationCode(user, "password", "", false);
+    await this.user.createOrUpdateVerificationCode(user, "password", codeDetails?.code, false);
 
     const options: EmailOptions = {
       recipient: user.email,
@@ -239,6 +242,10 @@ export class AuthService {
       throw new ApiError(Message.otpExpired, 400);
     }
 
+    if (!codeDetails?.valid) {
+      throw new ApiError(Message.otpUsed, 400);
+    }
+
     if (codeDetails?.code !== payload.otpCode) {
       throw new ApiError(Message.invalidOtp, 400);
     }
@@ -247,10 +254,11 @@ export class AuthService {
       { id: user.id },
       {
         is_active: true,
+        access: true,
       }
     );
 
-    await this.user.createOrUpdateVerificationCode(user, "email", "", false);
+    await this.user.createOrUpdateVerificationCode(user, "email", codeDetails?.code, false);
   }
 
   private async _sendEmailConfirmation(user: IUser, otpCode?: string | null) {

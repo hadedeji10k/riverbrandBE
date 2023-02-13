@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { Container } from "typedi";
-import { completeProfileSchema, updateUserPasswordSchema } from "../../schema";
+import { completeProfileSchema, resetForgotTransactionPinSchema, setUserPinSchema, updateUserPasswordSchema, updateUserPinSchema } from "../../schema";
 import { UserController } from "../controllers";
 import { auth } from "../middleware";
 import {
@@ -84,5 +84,36 @@ export async function user(app: FastifyInstance) {
       onRequest: [auth.user(), auth.ensureUserNotSuspended(), auth.ensureEmailConfirmed()],
     },
     controller.updateUserPassword.bind(controller)
+  );
+  app.post(
+    "/set-pin",
+    {
+      schema: { body: setUserPinSchema },
+      onRequest: [auth.user(), auth.ensureUserNotSuspended(), auth.ensureEmailConfirmed()],
+    },
+    controller.setUserPin.bind(controller)
+  );
+  app.put(
+    "/update-pin",
+    {
+      schema: { body: updateUserPinSchema },
+      onRequest: [auth.user(), auth.ensureUserNotSuspended(), auth.ensureEmailConfirmed()],
+    },
+    controller.updateUserPin.bind(controller)
+  );
+  app.post(
+    "/pin/reset",
+    {
+      onRequest: [auth.user(), auth.ensureUserNotSuspended(), auth.ensureEmailConfirmed()],
+    },
+    controller.requestForgotTransactionPin.bind(controller)
+  );
+  app.put(
+    "/pin/reset",
+    {
+      schema: { body: resetForgotTransactionPinSchema },
+      onRequest: [auth.user(), auth.ensureUserNotSuspended(), auth.ensureEmailConfirmed()],
+    },
+    controller.resetForgotTransactionPin.bind(controller)
   );
 }

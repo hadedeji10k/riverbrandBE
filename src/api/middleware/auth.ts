@@ -74,7 +74,7 @@ function ensureUserNotSuspended() {
         throw new ApiError(Message.authenticationRequired, 401);
       }
 
-      if (!user.access) {
+      if (!user.is_active) {
         throw new ApiError(Message.userSuspended, 401);
       }
     } catch (e) {

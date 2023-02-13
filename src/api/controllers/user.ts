@@ -2,13 +2,15 @@ import { Service } from "typedi";
 import { UserService } from "../../services";
 import { Message, response } from "../../utils";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { IForgotPinReset } from '../../interfaces/user';
 import {
   ICompleteProfilePayload,
   IRequestPhoneNumberVerification,
   ISetProfilePicture,
   IUpdatePassword,
   IUpdateUser,
-  IUpdateUserAddress,
+  IUpdateTransactionPin,
+  ISetTransactionPin,
   IPagination,
   IVerifyUserPhoneNumber,
 } from "../../interfaces";
@@ -37,11 +39,7 @@ export class UserController {
   public async getCurrentUser(request: FastifyRequest, reply: FastifyReply) {
     const { user }: { [key: string]: any } = request;
 
-    const data = {
-      ...user,
-      id: Number(user.id),
-      password: null,
-    };
+    const data = await this.userService.getCurrentUser(user);
 
     return response.success(reply, {
       message: "User fetched successfully",
@@ -156,6 +154,60 @@ export class UserController {
     const data = await this.userService.updateUserPassword(payload, user);
     return response.success(reply, {
       message: Message.userProfileUpdated,
+      data,
+    });
+  }
+
+  public async setUserPin(request: FastifyRequest, reply: FastifyReply) {
+    const { body, user }: { [key: string]: any } = request;
+
+    const payload: ISetTransactionPin = {
+      pin: body.pin,
+    };
+
+    const data = await this.userService.setUserPin(payload, user);
+    return response.success(reply, {
+      message: Message.pinSetSuccessfully,
+      data,
+    });
+  }
+
+  public async updateUserPin(request: FastifyRequest, reply: FastifyReply) {
+    const { body, user }: { [key: string]: any } = request;
+
+    const payload: IUpdateTransactionPin = {
+      oldPin: body.oldPin,
+      newPin: body.newPin,
+    };
+
+    const data = await this.userService.updateUserPin(payload, user);
+    return response.success(reply, {
+      message: Message.pinUpdateSuccessfully,
+      data,
+    });
+  }
+
+  public async requestForgotTransactionPin(request: FastifyRequest, reply: FastifyReply) {
+    const { user }: { [key: string]: any } = request;
+
+    const data = await this.userService.requestForgotTransactionPin(user);
+    return response.success(reply, {
+      message: Message.pinOtpSent,
+      data,
+    });
+  }
+
+  public async resetForgotTransactionPin(request: FastifyRequest, reply: FastifyReply) {
+    const { body, user }: { [key: string]: any } = request;
+
+    const payload: IForgotPinReset = {
+      otpCode: body.otpCode,
+      pin: body.pin,
+    };
+
+    const data = await this.userService.resetForgotTransactionPin(payload, user);
+    return response.success(reply, {
+      message: Message.pinResetSuccessfully,
       data,
     });
   }

@@ -127,7 +127,7 @@ export const accountCreationTemplate = (
     <div class="main">
       <div class="logo">
         <img
-          src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837480/mascot_bdtfvu.svg"
+          src=""
           alt=""
         />
       </div>
@@ -155,7 +155,7 @@ export const accountCreationTemplate = (
       <footer>
         <div>
           <img
-            src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/logo_mqrd39.svg"
+            src=""
             alt=""
           />
         </div>
@@ -172,7 +172,7 @@ export const accountCreationTemplate = (
             href="https://www.facebook.com/myriverbrandapp/"
           >
             <img
-              src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/facebook_uiqfqv.svg"
+              src=""
               alt=""
             />
           </a>
@@ -182,7 +182,7 @@ export const accountCreationTemplate = (
             href=" https://twitter.com/myriverbrandapp"
           >
             <img
-              src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/twitter_ehfdol.svg "
+              src=""
               alt=""
             />
           </a>
@@ -192,13 +192,13 @@ export const accountCreationTemplate = (
             href="https://instagram.com/"
           >
             <img
-              src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/instagram_bvfudv.svg"
+              src=""
               alt=""
             />
           </a>
           <a class="icons" target="_blank" href=" https://t.me/riverbrandapp">
             <img
-              src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/telegram_irjfqw.svg"
+              src=""
               alt=""
             />
           </a>
@@ -208,7 +208,7 @@ export const accountCreationTemplate = (
             href="https://www.linkedin.com/company/riverbrandapp/"
           >
             <img
-              src="https://res.cloudinary.com/dj0rcdagd/image/upload/v1672837477/linkedin_nctdat.svg"
+              src=""
               alt=""
             />
           </a>

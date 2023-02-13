@@ -1,6 +1,6 @@
 import { EmailOptions } from "../../../interfaces";
 
-export const contactUsTemplate = (
+export const userForgetPinTemplate = (
   { context }: Pick<EmailOptions, "context">,
 ) => `
 <!DOCTYPE html>
@@ -9,9 +9,12 @@ export const contactUsTemplate = (
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RiverBrand - Account created</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
       @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@100;200;300;500;700&display=swap");
 
@@ -27,9 +30,25 @@ export const contactUsTemplate = (
       p {
         margin: 30px 0;
       }
+
+      footer p {
+        width: 50%;
+        margin: 20px auto;
+      }
+
+      span {
+        color: #285489;
+      }
+
+      .text {
+        text-align: left;
+        width: 80%;
+        margin: 0 auto;
+      }
+
       .main {
         width: 100%;
-        background-color: #fff !important;
+        background-color: #ededed !important;
         padding: 20px;
         text-align: center;
         color: black !important;
@@ -70,12 +89,42 @@ export const contactUsTemplate = (
         height: 25px;
       }
       .code {
-        background: #4caf50;
+        background: #d90429;
         color: #fff;
         border-radius: 15px;
         padding: 10px;
         font-size: 1.2rem;
         font-weight: bold;
+      }
+
+      .container {
+        width: 50%;
+        margin: 0 auto;
+        padding: 20px 0;
+        background-color: #fff !important;
+      }
+
+      @media screen and (max-width: 968px) {
+        .container {
+          width: 100%;
+        }
+        .iconContainer {
+          width: 100%;
+        }
+
+        .condition {
+          font-size: 12px;
+          width: 80%;
+          margin: 0 auto;
+        }
+
+        .text {
+          font-size: 14px;
+        }
+
+        footer p {
+          width: 100%;
+        }
       }
     </style>
   </head>
@@ -83,39 +132,52 @@ export const contactUsTemplate = (
   <body>
     <div class="main">
       <div class="logo">
-        <h2>RiverBrand</h2>
+        <img
+          src=""
+          alt=""
+        />
       </div>
-      <hr class="line" />
 
-      <section>
-        <h1 class="title">A message from: ${context.email}</h1>
-        <h1 class="title">Name: ${context.name}</h1>
-      </section>
-      <main>
-        <p>
-            The message is as follows:
-        </p>
+      <div class="container">
+        <section>
+          <h1 class="title">Pin Reset</h1>
+        </section>
+        <main>
+          <p class="text">
+            Someone requested a pin reset for your account. If this was not
+            you, please disregard this email. Otherwise, simply use the code
+            below:
+          </p>
 
-        <p>${context.message}</p>
+          <p><span class="code">${context.activationCode}</span></p>
 
-        <p>
-          If you have any complaints, please contact our <b>support</b> <br />
-          or send us an email <b>support@riverbrand.com</b>
-        </p>
-      </main>
-      <hr class="line" />
+          <p class="condition">
+            <b
+              >If you did not forget your pin you can safely ignore this
+              email.</b
+            >
+          </p>
+        </main>
+      </div>
+
       <footer>
-        <p>
-          If you need any help with your account <br />
-          check the help center or <br />
-          our team directly here
-        </p>
+        <div>
+          <img
+            src=""
+            alt=""
+          />
+        </div>
 
         <p>
+          If you have any complaints, please contact our support or send us an
+          email <span>support@riverbrandapp.co</span>
+        </p>
+
+        <p class="iconContainer">
           <a
             class="icons"
             target="_blank"
-            href="https://web.facebook.com/"
+            href="https://www.facebook.com/myriverbrandapp/"
           >
             <img
               src=""
@@ -125,8 +187,20 @@ export const contactUsTemplate = (
           <a
             class="icons"
             target="_blank"
-            href="https://twitter.com/"
+            href=" https://twitter.com/myriverbrandapp"
           >
+            <img
+              src=""
+              alt=""
+            />
+          </a>
+          <a class="icons" target="_blank" href="https://instagram.com/">
+            <img
+              src=""
+              alt=""
+            />
+          </a>
+          <a class="icons" target="_blank" href=" https://t.me/riverbrandapp">
             <img
               src=""
               alt=""
@@ -135,23 +209,7 @@ export const contactUsTemplate = (
           <a
             class="icons"
             target="_blank"
-            href="https://instagram.com/"
-          >
-            <img
-              src=""
-              alt=""
-            />
-          </a>
-          <a class="icons" target="_blank" href="https://t.me/">
-            <img
-              src=""
-              alt=""
-            />
-          </a>
-          <a
-            class="icons"
-            target="_blank"
-            href="https://www.linkedin.com/company/"
+            href="https://www.linkedin.com/company/riverbrandapp/"
           >
             <img
               src=""
@@ -159,8 +217,6 @@ export const contactUsTemplate = (
             />
           </a>
         </p>
-
-        <p>🖤 The RiverBrand Team</p>
       </footer>
     </div>
   </body>
