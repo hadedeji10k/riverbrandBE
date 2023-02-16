@@ -9,7 +9,7 @@
     "prisma:push": "prisma db push",
     "deploy": "npm run build && npm run start",
     "test": "yarn build && tap --no-check-coverage --no-coverage-report ./dist/tests/index.js",
-    "start": "node -r dotenv/config ./dist"
+    "start": "npm run deploy && node -r dotenv/config ./dist"
   },
   "dependencies": {
     "@fastify/cors": "^8.1.0",
